@@ -164,7 +164,8 @@ export default function ResultsModal({ onRestart, snippetsCompleted }: ResultsMo
         {/* Next Test Button */}
         <button
           onClick={onRestart}
-          className="px-8 py-3 bg-main hover:opacity-80 border-none rounded-lg text-sm font-medium text-bg cursor-pointer font-mono transition-opacity"
+          className="px-8 py-3 bg-main hover:opacity-80 border-none rounded-lg text-sm font-medium cursor-pointer font-mono transition-opacity"
+          style={{ color: '#1a1a1a' }}
         >
           {mode === 'practice' ? 'continue' : 'next test'}
         </button>

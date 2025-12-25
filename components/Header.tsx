@@ -40,7 +40,8 @@ export default function Header() {
           ) : (
             <button
               onClick={() => signIn('google')}
-              className="px-5 py-2.5 text-sm font-medium text-bg bg-main hover:bg-yellow-600 rounded-lg cursor-pointer font-mono border-none transition-colors"
+              className="px-5 py-2.5 text-sm font-medium rounded-lg cursor-pointer font-mono border-none transition-opacity hover:opacity-80"
+              style={{ backgroundColor: 'var(--color-main)', color: '#1a1a1a' }}
             >
               login
             </button>
@@ -93,7 +94,8 @@ export default function Header() {
           ) : (
             <button
               onClick={() => { signIn('google'); setMenuOpen(false); }}
-              className="px-5 py-2.5 text-sm font-medium text-bg bg-main hover:bg-yellow-600 rounded-lg cursor-pointer font-mono border-none transition-colors w-full"
+              className="px-5 py-2.5 text-sm font-medium rounded-lg cursor-pointer font-mono border-none transition-opacity hover:opacity-80 w-full"
+              style={{ backgroundColor: 'var(--color-main)', color: '#1a1a1a' }}
             >
               login
             </button>
