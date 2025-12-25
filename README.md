@@ -2,10 +2,12 @@
 
 A typing speed application designed for programmers. Practice typing with real code snippets and improve your WPM and accuracy.
 
-[![GitHub stars](https://img.shields.io/github/stars/PankajKumardev/devtype?style=social)](https://github.com/PankajKumardev/devtype)
+[![GitHub stars](https://img.shields.io/github/stars/pankajkumardev/devtype?style=social)](https://github.com/pankajkumardev/devtype)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green?style=for-the-badge&logo=mongodb)
+
+🔗 **Live Demo:** [devtype.pankajk.tech](https://devtype.pankajk.tech)
 
 ## Features
 
@@ -44,7 +46,7 @@ A typing speed application designed for programmers. Practice typing with real c
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/PankajKumardev/devtype.git
+   git clone https://github.com/pankajkumardev/devtype.git
    cd devtype-app
    ```
 
@@ -143,4 +145,4 @@ MIT License
 
 ---
 
-**Made for developers by [Pankaj Kumar](https://github.com/PankajKumardev)**
+**Made for developers by [Pankaj Kumar](https://github.com/pankajkumardev)**
