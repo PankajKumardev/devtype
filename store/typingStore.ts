@@ -121,42 +121,38 @@ export const useTypingStore = create<TypingState>((set, get) => ({
   },
 
   updateInput: (input) => {
-    const { currentSnippet, userInput, keyErrors, currentIndex } = get();
-    const inputLen = input.length;
+    const { currentSnippet, userInput, keyErrors } = get();
+    const newIndex = input.length;
+    const lastCharIndex = newIndex - 1;
     
-    // Handle backspace - always allow going back
-    if (inputLen < userInput.length) {
-      set({ userInput: input, currentIndex: inputLen });
-      get().updateLiveWpm();
-      return;
-    }
-    
-    // Handle new character typed
-    if (inputLen > userInput.length) {
-      const typingIndex = userInput.length; // Current position being typed
-      const expectedChar = currentSnippet[typingIndex];
-      const typedChar = input[inputLen - 1]; // The new character typed
+    // Only process if adding characters (not backspace)
+    if (input.length > userInput.length && lastCharIndex >= 0) {
+      const expectedChar = currentSnippet[lastCharIndex];
+      const typedChar = input[lastCharIndex];
       
-      if (typedChar === expectedChar) {
-        // Correct character - advance
-        set({
-          userInput: input,
-          currentIndex: inputLen,
-          correctChars: get().correctChars + 1,
-          totalKeystrokes: get().totalKeystrokes + 1,
-        });
-      } else {
-        // Wrong character - DON'T advance, just track the error
+      if (typedChar !== expectedChar) {
+        // Wrong character - track error
         const newKeyErrors = { ...keyErrors };
         newKeyErrors[expectedChar] = (newKeyErrors[expectedChar] || 0) + 1;
         
         set({
-          // Keep userInput the same (don't add wrong char)
+          userInput: input,
+          currentIndex: newIndex,
           incorrectChars: get().incorrectChars + 1,
           totalKeystrokes: get().totalKeystrokes + 1,
           keyErrors: newKeyErrors,
         });
+      } else {
+        // Correct character
+        set({
+          userInput: input,
+          currentIndex: newIndex,
+          correctChars: get().correctChars + 1,
+          totalKeystrokes: get().totalKeystrokes + 1,
+        });
       }
+    } else {
+      set({ userInput: input, currentIndex: newIndex });
     }
     
     // Update live WPM
@@ -164,13 +160,15 @@ export const useTypingStore = create<TypingState>((set, get) => ({
   },
 
   updateLiveWpm: () => {
-    const { startTime, correctChars } = get();
+    const { startTime, correctChars, incorrectChars } = get();
     if (!startTime) return;
     
     const elapsedMinutes = (Date.now() - startTime) / 60000;
     if (elapsedMinutes < 0.05) return; // Wait at least 3 seconds
     
-    const liveWpm = Math.round((correctChars / 5) / elapsedMinutes);
+    // Net characters = correct - errors (penalty for mistakes)
+    const netChars = Math.max(0, correctChars - incorrectChars);
+    const liveWpm = Math.round((netChars / 5) / elapsedMinutes);
     set({ liveWpm: Math.min(liveWpm, 300) }); // Cap at 300 WPM
   },
 
@@ -186,14 +184,18 @@ export const useTypingStore = create<TypingState>((set, get) => ({
   },
 
   calculateResults: () => {
-    const { correctChars, totalKeystrokes, duration, timeRemaining, mode, personalBest } = get();
+    const { correctChars, incorrectChars, totalKeystrokes, duration, timeRemaining, mode, personalBest } = get();
     
     const timeElapsed = mode === 'timed' 
       ? duration - timeRemaining 
       : (Date.now() - (get().startTime || Date.now())) / 1000;
     
     const minutes = timeElapsed / 60;
-    const wpm = minutes > 0 ? Math.round((correctChars / 5) / minutes) : 0;
+    
+    // Net characters = correct - errors (penalty for mistakes)
+    const netChars = Math.max(0, correctChars - incorrectChars);
+    const wpm = minutes > 0 ? Math.round((netChars / 5) / minutes) : 0;
+    
     const accuracy = totalKeystrokes > 0 
       ? Math.round((correctChars / totalKeystrokes) * 100) 
       : 0;
