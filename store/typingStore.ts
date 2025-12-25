@@ -1,10 +1,13 @@
 import { create } from 'zustand';
 import { Language } from '@/lib/snippets';
 
+export type TestMode = 'timed' | 'practice';
+
 export interface TypingState {
   // Test configuration
   duration: number;
   language: Language | 'all';
+  mode: TestMode;
   
   // Test state
   isTestActive: boolean;
@@ -20,6 +23,9 @@ export interface TypingState {
   incorrectChars: number;
   totalKeystrokes: number;
   
+  // Keyboard heatmap data
+  keyErrors: Record<string, number>;
+  
   // Results
   wpm: number;
   accuracy: number;
@@ -27,6 +33,7 @@ export interface TypingState {
   // Actions
   setDuration: (duration: number) => void;
   setLanguage: (language: Language | 'all') => void;
+  setMode: (mode: TestMode) => void;
   setCurrentSnippet: (snippet: string) => void;
   startTest: () => void;
   updateInput: (input: string) => void;
@@ -36,12 +43,14 @@ export interface TypingState {
   calculateResults: () => void;
   pauseTest: () => void;
   resumeTest: () => void;
+  recordKeyError: (key: string) => void;
 }
 
 export const useTypingStore = create<TypingState>((set, get) => ({
   // Initial state
   duration: 30,
   language: 'all',
+  mode: 'timed',
   isTestActive: false,
   isTestComplete: false,
   isPaused: false,
@@ -52,6 +61,7 @@ export const useTypingStore = create<TypingState>((set, get) => ({
   correctChars: 0,
   incorrectChars: 0,
   totalKeystrokes: 0,
+  keyErrors: {},
   wpm: 0,
   accuracy: 0,
 
@@ -59,6 +69,8 @@ export const useTypingStore = create<TypingState>((set, get) => ({
   setDuration: (duration) => set({ duration, timeRemaining: duration }),
   
   setLanguage: (language) => set({ language }),
+  
+  setMode: (mode) => set({ mode }),
   
   setCurrentSnippet: (snippet) => set({ currentSnippet: snippet }),
   
@@ -71,12 +83,20 @@ export const useTypingStore = create<TypingState>((set, get) => ({
     correctChars: 0,
     incorrectChars: 0,
     totalKeystrokes: 0,
+    keyErrors: {},
     timeRemaining: get().duration,
   }),
   
   pauseTest: () => set({ isPaused: true }),
   
   resumeTest: () => set({ isPaused: false }),
+  
+  recordKeyError: (key) => {
+    const state = get();
+    const newErrors = { ...state.keyErrors };
+    newErrors[key.toLowerCase()] = (newErrors[key.toLowerCase()] || 0) + 1;
+    set({ keyErrors: newErrors });
+  },
   
   updateInput: (input) => {
     const state = get();
@@ -96,6 +116,10 @@ export const useTypingStore = create<TypingState>((set, get) => ({
         correct++;
       } else {
         incorrect++;
+        // Record the error
+        if (snippet[i] && input.length > state.userInput.length) {
+          get().recordKeyError(snippet[i]);
+        }
       }
     }
     
@@ -110,7 +134,7 @@ export const useTypingStore = create<TypingState>((set, get) => ({
   
   tick: () => {
     const state = get();
-    if (state.isPaused) return;
+    if (state.isPaused || state.mode === 'practice') return;
     
     const newTime = state.timeRemaining - 1;
     
@@ -128,7 +152,9 @@ export const useTypingStore = create<TypingState>((set, get) => ({
   
   calculateResults: () => {
     const state = get();
-    const timeElapsed = (state.duration - state.timeRemaining) / 60;
+    const timeElapsed = state.mode === 'practice' 
+      ? 1 // Assume 1 minute for practice mode
+      : (state.duration - state.timeRemaining) / 60;
     const totalChars = state.correctChars;
     const wpm = timeElapsed > 0 ? Math.round((totalChars / 5) / timeElapsed) : 0;
     const accuracy = state.totalKeystrokes > 0 
@@ -157,6 +183,7 @@ export const useTypingStore = create<TypingState>((set, get) => ({
       correctChars: 0,
       incorrectChars: 0,
       totalKeystrokes: 0,
+      keyErrors: {},
       wpm: 0,
       accuracy: 0,
     });

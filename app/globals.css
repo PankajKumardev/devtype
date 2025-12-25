@@ -4,17 +4,32 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-bg: #323437;
+  --color-bg-sub: #2c2e31;
+  --color-text: #d1d0c5;
+  --color-sub: #646669;
+  --color-main: #e2b714;
+  --color-error: #ca4754;
+  --color-border: #3d3d3d;
+}
+
 @layer base {
   * {
     @apply box-border m-0 p-0;
   }
 
   html, body {
-    @apply font-mono bg-bg text-text min-h-screen;
+    font-family: 'JetBrains Mono', monospace;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    min-height: 100vh;
+    transition: background-color 0.3s, color 0.3s;
   }
 
   ::selection {
-    @apply bg-main text-bg;
+    background-color: var(--color-main);
+    color: var(--color-bg);
   }
 
   *:focus {
@@ -24,9 +39,20 @@
 
 @layer utilities {
   .caret {
-    @apply border-l-2 border-main -ml-px pl-px;
+    border-left: 2px solid var(--color-main);
     animation: blink 1s step-end infinite;
+    margin-left: -1px;
+    padding-left: 1px;
   }
+
+  .bg-bg { background-color: var(--color-bg); }
+  .bg-bg-sub { background-color: var(--color-bg-sub); }
+  .text-text { color: var(--color-text); }
+  .text-sub { color: var(--color-sub); }
+  .text-main { color: var(--color-main); }
+  .text-error { color: var(--color-error); }
+  .border-border { border-color: var(--color-border); }
+  .bg-border { background-color: var(--color-border); }
 }
 
 @keyframes blink {
