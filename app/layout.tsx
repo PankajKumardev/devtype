@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Providers from "@/components/Providers";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 
 const siteUrl = "https://devtype.pankajk.tech";
 
@@ -87,6 +88,7 @@ export default function RootLayout({
         <Providers>
           {children}
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
