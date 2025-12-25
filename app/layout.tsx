@@ -34,11 +34,20 @@ export const metadata: Metadata = {
     siteName: "DevType",
     title: "DevType - Master Your Coding Speed",
     description: "Practice typing with real code snippets. Improve your WPM and accuracy with TypeScript, JavaScript, Python, Rust, Go, Java, and C++.",
+    images: [
+      {
+        url: `${siteUrl}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "DevType - Typing Speed Test for Developers",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "DevType - Master Your Coding Speed",
     description: "Practice typing with real code snippets. Improve your WPM and accuracy.",
+    images: [`${siteUrl}/og-image.png`],
     creator: "@pankajkumardev",
   },
   robots: {
