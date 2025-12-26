@@ -8,9 +8,16 @@ import TypingTest from './TypingTest';
 import ResultsModal from './ResultsModal';
 
 export default function TypingTestContainer() {
-  const { setSnippet, resetTest, language, isTestActive } = useTypingStore();
+  const { setSnippet, resetTest, language, isTestActive, loadSettings } = useTypingStore();
   const [snippetsCompleted, setSnippetsCompleted] = useState(0);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
   const languageRef = useRef(language);
+
+  // Load saved settings on mount
+  useEffect(() => {
+    loadSettings();
+    setSettingsLoaded(true);
+  }, [loadSettings]);
 
   useEffect(() => {
     languageRef.current = language;
@@ -21,9 +28,12 @@ export default function TypingTestContainer() {
     setSnippet(snippet.code);
   }, [setSnippet]);
 
+  // Load snippet only after settings are loaded
   useEffect(() => {
-    loadSnippetForLanguage(language);
-  }, [language, loadSnippetForLanguage]);
+    if (settingsLoaded) {
+      loadSnippetForLanguage(language);
+    }
+  }, [language, loadSnippetForLanguage, settingsLoaded]);
 
   const handleSnippetComplete = useCallback(() => {
     if (isTestActive) {

@@ -67,7 +67,24 @@ export default function TypingTest({ onSnippetComplete, onExit }: TypingTestProp
   }, [focusInput, currentSnippet, isPaused]);
 
   useEffect(() => {
+    let tabPressed = false;
+    
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Track Tab key
+      if (e.key === 'Tab') {
+        tabPressed = true;
+        // Don't prevent default here - let Tab work normally for typing
+      }
+      
+      // Tab + Enter to restart (like MonkeyType)
+      if (e.key === 'Enter' && tabPressed && isTestActive) {
+        e.preventDefault();
+        resetTest();
+        onExit();
+        tabPressed = false;
+        return;
+      }
+      
       if (e.key === 'Escape' && isTestActive) {
         if (mode === 'practice') {
           calculateResults();
@@ -81,8 +98,19 @@ export default function TypingTest({ onSnippetComplete, onExit }: TypingTestProp
         focusInput();
       }
     };
+    
+    const handleGlobalKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        tabPressed = false;
+      }
+    };
+    
     window.addEventListener('keydown', handleGlobalKeyDown);
-    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+    window.addEventListener('keyup', handleGlobalKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown);
+      window.removeEventListener('keyup', handleGlobalKeyUp);
+    };
   }, [isTestActive, isPaused, resetTest, resumeTest, onExit, focusInput, mode, calculateResults]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

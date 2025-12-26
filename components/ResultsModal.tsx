@@ -87,7 +87,12 @@ export default function ResultsModal({ onRestart, snippetsCompleted }: ResultsMo
     
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
-        onRestart();
+        e.preventDefault();
+        e.stopPropagation();
+        // Small delay to prevent the key from being registered in the next test
+        setTimeout(() => {
+          onRestart();
+        }, 50);
       }
     };
     

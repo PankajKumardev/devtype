@@ -56,6 +56,7 @@ interface TypingState {
   loadStreak: () => void;
   updateStreak: () => void;
   loadPersonalBest: () => void;
+  loadSettings: () => void;
 }
 
 export const useTypingStore = create<TypingState>((set, get) => ({
@@ -83,9 +84,24 @@ export const useTypingStore = create<TypingState>((set, get) => ({
   personalBest: 0,
   isNewPersonalBest: false,
 
-  setDuration: (duration) => set({ duration, timeRemaining: duration }),
-  setLanguage: (language) => set({ language }),
-  setMode: (mode) => set({ mode }),
+  setDuration: (duration) => {
+    set({ duration, timeRemaining: duration });
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('devtype-duration', duration.toString());
+    }
+  },
+  setLanguage: (language) => {
+    set({ language });
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('devtype-language', language);
+    }
+  },
+  setMode: (mode) => {
+    set({ mode });
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('devtype-mode', mode);
+    }
+  },
   setSnippet: (snippet) => set({ currentSnippet: snippet, userInput: '', currentIndex: 0 }),
 
   startTest: () => set({ 
@@ -270,6 +286,34 @@ export const useTypingStore = create<TypingState>((set, get) => ({
     const saved = localStorage.getItem('devtype-personal-best');
     if (saved) {
       set({ personalBest: parseInt(saved) });
+    }
+  },
+
+  loadSettings: () => {
+    if (typeof window === 'undefined') return;
+    
+    const savedDuration = localStorage.getItem('devtype-duration');
+    const savedLanguage = localStorage.getItem('devtype-language');
+    const savedMode = localStorage.getItem('devtype-mode');
+    
+    const updates: Partial<TypingState> = {};
+    
+    if (savedDuration) {
+      const duration = parseInt(savedDuration);
+      updates.duration = duration;
+      updates.timeRemaining = duration;
+    }
+    
+    if (savedLanguage && ['typescript', 'javascript', 'python', 'rust', 'go', 'java', 'cpp'].includes(savedLanguage)) {
+      updates.language = savedLanguage as Language;
+    }
+    
+    if (savedMode && (savedMode === 'timed' || savedMode === 'practice')) {
+      updates.mode = savedMode as TestMode;
+    }
+    
+    if (Object.keys(updates).length > 0) {
+      set(updates);
     }
   },
 }));
