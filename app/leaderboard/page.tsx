@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { languages } from '@/lib/snippets';
 import { LeaderboardSkeleton } from '@/components/Skeletons';
+import { useDataCache } from '@/store/dataCacheStore';
 
 interface LeaderboardEntry {
   rank: number;
@@ -18,25 +19,42 @@ interface LeaderboardEntry {
 }
 
 export default function LeaderboardPage() {
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const { leaderboard: cachedLeaderboard, setLeaderboardData, shouldRefresh } = useDataCache();
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
-  const [loading, setLoading] = useState(true);
+  const cached = cachedLeaderboard[selectedLanguage];
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(cached?.entries || []);
+  const [loading, setLoading] = useState(!cached);
 
   useEffect(() => {
-    fetchLeaderboard();
+    // If we have cached data for this language, use it immediately
+    const cachedData = cachedLeaderboard[selectedLanguage];
+    if (cachedData) {
+      setLeaderboard(cachedData.entries);
+      setLoading(false);
+      
+      // Check if we should refresh
+      if (shouldRefresh(cachedData.lastFetched)) {
+        fetchLeaderboard();
+      }
+    } else {
+      // No cache for this language, fetch immediately
+      fetchLeaderboard();
+    }
   }, [selectedLanguage]);
 
   const fetchLeaderboard = async () => {
-    setLoading(true);
     try {
       const response = await fetch(
         `/api/leaderboard?language=${selectedLanguage}&limit=50`
       );
       const data = await response.json();
-      setLeaderboard(data.leaderboard || []);
+      const entries = data.leaderboard || [];
+      
+      setLeaderboard(entries);
+      setLeaderboardData(selectedLanguage, entries);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
-    } finally {
       setLoading(false);
     }
   };

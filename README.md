@@ -11,17 +11,38 @@ A typing speed application designed for programmers. Practice typing with real c
 
 ## Features
 
+### Core Features
 - **Real Code Snippets** - Practice with TypeScript, JavaScript, Python, Rust, Go, Java, and C++
-- **Multiple Themes** - Dark themes including default, mocha, nord, ocean, and dracula
-- **Timed & Practice Modes** - Choose 15s, 30s, 60s timed tests or unlimited practice mode
-- **Live WPM Counter** - See your speed in real-time while typing
+- **Multiple Themes** - Dark and light themes (default, mocha, nord, ocean, forest, sunset)
+- **Timed & Practice Modes** - Choose 15s, 30s, 60s, 120s, or custom duration; unlimited practice mode
+- **Live WPM Counter** - Real-time speed tracking with error penalty
+- **Smart WPM Calculation** - WPM = (Correct Chars - Errors) / 5 / Minutes (prevents spam)
+
+### Progress Tracking
 - **Personal Best Tracking** - Confetti celebration when you beat your record
 - **Daily Streak** - Track consecutive days of practice
 - **Achievement Badges** - Unlock achievements for speed, accuracy, and consistency
 - **Problem Keys** - See which keys you miss most often
-- **Leaderboard** - Compete globally with other developers
-- **Dashboard** - Track your progress with charts and stats
-- **Responsive Design** - Works on desktop and mobile
+- **Progress Charts** - Visualize your improvement over time
+
+### Competitive Features
+- **Global Leaderboard** - Compete with developers worldwide
+- **Weighted Scoring** - Ranks by WPM × Accuracy (both matter!)
+- **Per-Language Rankings** - Separate leaderboards for each language
+- **Anti-Spam Protection** - Minimum 70% accuracy required, prevents random key mashing
+
+### User Experience
+- **Instant Loading** - Smart caching makes pages load instantly
+- **Responsive Design** - Optimized for desktop, tablet, and mobile
+- **Keyboard Shortcuts** - Tab, Enter, Esc for efficient navigation
+- **Restart Mid-Test** - Restart button to get a new snippet anytime
+- **Skeleton Loaders** - Smooth loading experience
+
+### SEO & PWA
+- **Meta Tags** - Complete SEO with Open Graph and Twitter cards
+- **Dynamic OG Images** - Auto-generated social preview images
+- **Sitemap & Robots.txt** - Full search engine optimization
+- **PWA Manifest** - Installable as a progressive web app
 
 ## Tech Stack
 
@@ -30,7 +51,7 @@ A typing speed application designed for programmers. Practice typing with real c
 - **Styling**: Tailwind CSS v4
 - **Database**: MongoDB (via Mongoose)
 - **Authentication**: NextAuth.js v5 (Google Provider)
-- **State Management**: Zustand
+- **State Management**: Zustand (with smart caching)
 - **Charts**: Recharts
 - **Confetti**: canvas-confetti
 
@@ -85,6 +106,9 @@ devtype-app/
 │   │   └── scores/
 │   ├── dashboard/
 │   ├── leaderboard/
+│   ├── opengraph-image.tsx    # Dynamic OG image generation
+│   ├── twitter-image.tsx       # Twitter card generation
+│   ├── sitemap.ts              # SEO sitemap
 │   ├── globals.css
 │   └── page.tsx
 ├── components/
@@ -93,9 +117,10 @@ devtype-app/
 │   ├── TypingTest.tsx
 │   ├── TypingTestContainer.tsx
 │   ├── ResultsModal.tsx
-│   └── ThemeSelector.tsx
+│   ├── ThemeSelector.tsx
+│   └── Skeletons.tsx           # Loading skeletons
 ├── data/
-│   └── snippets.json
+│   └── snippets.json           # 140 code snippets
 ├── lib/
 │   ├── mongodb.ts
 │   ├── snippets.ts
@@ -105,15 +130,20 @@ devtype-app/
 │   └── Score.ts
 ├── store/
 │   ├── typingStore.ts
-│   └── themeStore.ts
+│   ├── themeStore.ts
+│   └── dataCacheStore.ts       # Smart caching
+├── public/
+│   ├── favicon.svg
+│   ├── robots.txt
+│   └── site.webmanifest
 └── auth.ts
 ```
 
 ## How to Use
 
 1. Select **timed** or **practice** mode
-2. Choose duration (15s, 30s, 60s) for timed mode
-3. Pick a language or select "all languages"
+2. Choose duration (15s, 30s, 60s, 120s, or custom) for timed mode
+3. Pick a programming language (TypeScript, JavaScript, Python, Rust, Go, Java, C++)
 4. Click the code area and start typing
 5. View results when done
 6. Login to save scores to leaderboard
@@ -128,9 +158,23 @@ devtype-app/
 ## WPM & Accuracy
 
 ```
-WPM = (Correct Characters / 5) / Minutes
+Net Characters = Correct Characters - Incorrect Characters
+WPM = (Net Characters / 5) / Minutes
 Accuracy = (Correct Keystrokes / Total Keystrokes) × 100%
+Weighted Score = WPM × (Accuracy / 100)
 ```
+
+**Anti-Spam**: Wrong characters reduce your WPM! This prevents random key mashing.
+
+## Performance Features
+
+### Smart Caching
+- **Dashboard & Leaderboard** cache data for 1 minute
+- **Instant Loading** - Pages open immediately with cached data
+- **Background Refresh** - Stale data updates silently
+- **Auto-Invalidation** - Cache clears when you add a new score
+
+See [CACHING.md](./CACHING.md) for technical details.
 
 ## Scripts
 
@@ -138,6 +182,10 @@ Accuracy = (Correct Keystrokes / Total Keystrokes) × 100%
 - `npm run build` - Production build
 - `npm start` - Production server
 - `npm run lint` - Run ESLint
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 

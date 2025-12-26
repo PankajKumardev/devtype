@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { getUnlockedAchievements, achievements, AchievementStats } from '@/lib/achievements';
 import { DashboardSkeleton } from '@/components/Skeletons';
+import { useDataCache } from '@/store/dataCacheStore';
 
 interface Score {
   _id: string;
@@ -22,32 +23,60 @@ interface DashboardClientProps {
 }
 
 export default function DashboardClient({ session }: DashboardClientProps) {
-  const [scores, setScores] = useState<Score[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [dailyStreak, setDailyStreak] = useState(0);
+  const { dashboard, setDashboardData, shouldRefresh } = useDataCache();
+  const [scores, setScores] = useState<Score[]>(dashboard?.scores || []);
+  const [loading, setLoading] = useState(!dashboard);
+  const [dailyStreak, setDailyStreak] = useState(dashboard?.dailyStreak || 0);
   const [personalBest, setPersonalBest] = useState(0);
 
   useEffect(() => {
-    fetchScores();
     loadLocalStats();
+    
+    // If we have cached data, use it immediately
+    if (dashboard) {
+      setScores(dashboard.scores);
+      setDailyStreak(dashboard.dailyStreak);
+      setLoading(false);
+      
+      // Check if we should refresh
+      if (shouldRefresh(dashboard.lastFetched)) {
+        fetchScores();
+      }
+    } else {
+      // No cache, fetch immediately
+      fetchScores();
+    }
   }, []);
 
   const fetchScores = async () => {
     try {
       const response = await fetch('/api/scores');
       const data = await response.json();
-      setScores(data.scores || []);
+      const fetchedScores = data.scores || [];
+      
+      setScores(fetchedScores);
+      
+      // Load streak from localStorage
+      const streak = localStorage.getItem('devtype-streak');
+      const streakValue = streak ? parseInt(streak) : 0;
+      setDailyStreak(streakValue);
+      
+      // Update cache
+      setDashboardData({
+        scores: fetchedScores,
+        stats: session.user?.stats || { testsCompleted: 0, bestWpm: 0, avgAccuracy: 0 },
+        dailyStreak: streakValue,
+      });
+      
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching scores:', error);
-    } finally {
       setLoading(false);
     }
   };
 
   const loadLocalStats = () => {
-    const streak = localStorage.getItem('devtype-streak');
     const best = localStorage.getItem('devtype-personal-best');
-    if (streak) setDailyStreak(parseInt(streak));
     if (best) setPersonalBest(parseInt(best));
   };
 

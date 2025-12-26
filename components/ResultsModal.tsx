@@ -3,6 +3,7 @@
 import { useTypingStore } from '@/store/typingStore';
 import { useSession } from 'next-auth/react';
 import { useState, useEffect, useRef } from 'react';
+import { useDataCache } from '@/store/dataCacheStore';
 
 interface ResultsModalProps {
   onRestart: () => void;
@@ -15,6 +16,7 @@ export default function ResultsModal({ onRestart, snippetsCompleted }: ResultsMo
     isNewPersonalBest, dailyStreak 
   } = useTypingStore();
   const { data: session } = useSession();
+  const { invalidateDashboard, invalidateLeaderboard } = useDataCache();
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const autoSaveAttempted = useRef(false);
   const confettiTriggered = useRef(false);
@@ -68,6 +70,9 @@ export default function ResultsModal({ onRestart, snippetsCompleted }: ResultsMo
 
       if (response.ok) {
         setSaveStatus('saved');
+        // Invalidate cache so dashboard and leaderboard refresh with new score
+        invalidateDashboard();
+        invalidateLeaderboard();
       } else {
         setSaveStatus('error');
       }
