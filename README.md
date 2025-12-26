@@ -32,11 +32,20 @@ A typing speed application designed for programmers. Practice typing with real c
 - **Anti-Spam Protection** - Minimum 70% accuracy required, prevents random key mashing
 
 ### User Experience
+- **Smooth Caret** - Animated cursor that glides smoothly between characters
 - **Instant Loading** - Smart caching makes pages load instantly
 - **Responsive Design** - Optimized for desktop, tablet, and mobile
 - **Keyboard Shortcuts** - Tab, Enter, Esc for efficient navigation
 - **Restart Mid-Test** - Restart button to get a new snippet anytime
 - **Skeleton Loaders** - Smooth loading experience
+- **Toast Notifications** - Clean UI feedback for actions
+
+### Results & Analytics
+- **MonkeyType-Style Results** - Beautiful results modal with WPM graph
+- **Typing Replay** - Watch your typing session playback with variable speed
+- **Copy Results Image** - Share your results as an image on social media
+- **Export Data** - Download your typing history as JSON or CSV
+- **WPM History Graph** - Live WPM + Raw WPM chart with error markers
 
 ### SEO & PWA
 - **Meta Tags** - Complete SEO with Open Graph and Twitter cards

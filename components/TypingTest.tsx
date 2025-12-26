@@ -31,9 +31,12 @@ export default function TypingTest({ onSnippetComplete, onExit }: TypingTestProp
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const restartButtonRef = useRef<HTMLButtonElement>(null);
+  const codeBoxRef = useRef<HTMLDivElement>(null);
+  const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const [practiceTime, setPracticeTime] = useState(0);
   const [showHints, setShowHints] = useState(true);
   const [focusedButtonIndex, setFocusedButtonIndex] = useState(-1); // -1 = input, 1 = restart
+  const [caretPosition, setCaretPosition] = useState({ left: 0, top: 0 });
 
   useEffect(() => {
     loadStreak();
@@ -67,6 +70,26 @@ export default function TypingTest({ onSnippetComplete, onExit }: TypingTestProp
   useEffect(() => {
     focusInput();
   }, [focusInput, currentSnippet, isPaused]);
+
+  // Update smooth caret position
+  useEffect(() => {
+    const currentIndex = userInput.length;
+    const charEl = charRefs.current[currentIndex];
+    const containerEl = codeBoxRef.current;
+    
+    if (charEl && containerEl) {
+      const charRect = charEl.getBoundingClientRect();
+      const containerRect = containerEl.getBoundingClientRect();
+      
+      setCaretPosition({
+        left: charRect.left - containerRect.left + containerEl.scrollLeft,
+        top: charRect.top - containerRect.top + containerEl.scrollTop,
+      });
+    } else if (currentIndex === 0 && containerEl) {
+      // Position at start
+      setCaretPosition({ left: 0, top: 0 });
+    }
+  }, [userInput.length, currentSnippet]);
 
   useEffect(() => {
     let tabPressed = false;
@@ -315,15 +338,29 @@ export default function TypingTest({ onSnippetComplete, onExit }: TypingTestProp
 
       {/* Code Box */}
       <div
+        ref={codeBoxRef}
         onClick={focusInput}
         className="bg-bg-sub rounded-xl p-4 md:p-8 min-h-[180px] sm:min-h-[220px] md:min-h-[300px] cursor-text border border-border relative overflow-x-auto"
       >
+        {/* Smooth Caret */}
+        {!isPaused && !isTestComplete && (
+          <div
+            className="absolute w-0.5 bg-main pointer-events-none"
+            style={{
+              left: caretPosition.left,
+              top: caretPosition.top,
+              height: '1.5em',
+              transition: 'left 50ms ease-out, top 50ms ease-out',
+              animation: 'blink 1s step-end infinite',
+            }}
+          />
+        )}
+        
         <pre className="font-mono text-xs sm:text-sm md:text-base leading-relaxed md:leading-loose m-0 whitespace-pre-wrap break-words">
           {currentSnippet.split('').map((char, i) => {
             const isTyped = i < userInput.length;
             const isCorrect = isTyped && userInput[i] === char;
             const isIncorrect = isTyped && userInput[i] !== char;
-            const isCurrent = i === userInput.length;
             
             let style: React.CSSProperties = {};
             if (isCorrect) {
@@ -338,8 +375,8 @@ export default function TypingTest({ onSnippetComplete, onExit }: TypingTestProp
             return (
               <span 
                 key={i} 
+                ref={el => { charRefs.current[i] = el; }}
                 style={style}
-                className={isCurrent && !isPaused ? 'caret' : ''}
               >
                 {char}
               </span>
