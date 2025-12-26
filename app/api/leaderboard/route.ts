@@ -16,21 +16,32 @@ export async function GET(req: NextRequest) {
       query.language = language;
     }
 
-    // Get top scores - sort by weighted score (WPM * accuracy/100)
-    // This way both WPM and accuracy matter
-    // Since WPM is calculated from correct chars only, this is fair
+    // Get best score per user
+    // Group by userId, take the highest weighted score for each user
     const topScores = await Score.aggregate([
       { $match: query },
       {
         $addFields: {
           // Calculate weighted score: WPM * (accuracy/100)
-          // e.g., 100 WPM with 90% accuracy = 90 score
-          // e.g., 80 WPM with 100% accuracy = 80 score
           weightedScore: { $multiply: ['$wpm', { $divide: ['$accuracy', 100] }] }
         }
       },
+      // Sort by weighted score descending within each user
+      { $sort: { userId: 1, weightedScore: -1, timestamp: -1 } },
+      // Group by userId and take the first (best) score
+      {
+        $group: {
+          _id: '$userId',
+          bestScore: { $first: '$$ROOT' }
+        }
+      },
+      // Replace root with the best score document
+      { $replaceRoot: { newRoot: '$bestScore' } },
+      // Sort all users by their best weighted score
       { $sort: { weightedScore: -1, timestamp: -1 } },
+      // Limit to top N users
       { $limit: limit },
+      // Join with users collection
       {
         $lookup: {
           from: 'users',
