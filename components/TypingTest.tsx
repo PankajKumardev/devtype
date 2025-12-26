@@ -123,13 +123,42 @@ export default function TypingTest({ onSnippetComplete, onExit }: TypingTestProp
 
     if (e.key === 'Enter') {
       e.preventDefault();
-      const newValue = userInput + '\n';
+      // Add newline
+      let newValue = userInput + '\n';
+      
+      // Auto-add indentation from the next line in snippet
+      const nextLineStart = newValue.length;
+      if (nextLineStart < currentSnippet.length) {
+        // Get the indentation (leading spaces/tabs) from the snippet's next line
+        let indent = '';
+        for (let i = nextLineStart; i < currentSnippet.length; i++) {
+          const char = currentSnippet[i];
+          if (char === ' ' || char === '\t') {
+            indent += char;
+          } else {
+            break;
+          }
+        }
+        newValue += indent;
+      }
+      
       if (newValue.length <= currentSnippet.length) updateInput(newValue);
       return;
     }
     if (e.key === 'Tab') {
       e.preventDefault();
-      const newValue = userInput + '    ';
+      // Check how many spaces the snippet expects (could be 2 or 4)
+      const nextPos = userInput.length;
+      let tabSpaces = '';
+      for (let i = nextPos; i < currentSnippet.length && i < nextPos + 4; i++) {
+        if (currentSnippet[i] === ' ') {
+          tabSpaces += ' ';
+        } else {
+          break;
+        }
+      }
+      // Default to 4 spaces if snippet doesn't have spaces at this position
+      const newValue = userInput + (tabSpaces || '    ');
       if (newValue.length <= currentSnippet.length) updateInput(newValue);
       return;
     }

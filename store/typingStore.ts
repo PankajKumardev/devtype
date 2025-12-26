@@ -138,37 +138,40 @@ export const useTypingStore = create<TypingState>((set, get) => ({
 
   updateInput: (input) => {
     const { currentSnippet, userInput, keyErrors } = get();
-    const newIndex = input.length;
-    const lastCharIndex = newIndex - 1;
     
-    // Only process if adding characters (not backspace)
-    if (input.length > userInput.length && lastCharIndex >= 0) {
-      const expectedChar = currentSnippet[lastCharIndex];
-      const typedChar = input[lastCharIndex];
+    // Handle multiple characters (e.g., auto-indentation after Enter)
+    if (input.length > userInput.length) {
+      const newCharsCount = input.length - userInput.length;
+      let correct = 0;
+      let incorrect = 0;
+      const newKeyErrors = { ...keyErrors };
       
-      if (typedChar !== expectedChar) {
-        // Wrong character - track error
-        const newKeyErrors = { ...keyErrors };
-        newKeyErrors[expectedChar] = (newKeyErrors[expectedChar] || 0) + 1;
+      for (let i = 0; i < newCharsCount; i++) {
+        const charIndex = userInput.length + i;
+        const expectedChar = currentSnippet[charIndex];
+        const typedChar = input[charIndex];
         
-        set({
-          userInput: input,
-          currentIndex: newIndex,
-          incorrectChars: get().incorrectChars + 1,
-          totalKeystrokes: get().totalKeystrokes + 1,
-          keyErrors: newKeyErrors,
-        });
-      } else {
-        // Correct character
-        set({
-          userInput: input,
-          currentIndex: newIndex,
-          correctChars: get().correctChars + 1,
-          totalKeystrokes: get().totalKeystrokes + 1,
-        });
+        if (typedChar === expectedChar) {
+          correct++;
+        } else {
+          incorrect++;
+          if (expectedChar) {
+            newKeyErrors[expectedChar] = (newKeyErrors[expectedChar] || 0) + 1;
+          }
+        }
       }
+      
+      set({
+        userInput: input,
+        currentIndex: input.length,
+        correctChars: get().correctChars + correct,
+        incorrectChars: get().incorrectChars + incorrect,
+        totalKeystrokes: get().totalKeystrokes + newCharsCount,
+        keyErrors: newKeyErrors,
+      });
     } else {
-      set({ userInput: input, currentIndex: newIndex });
+      // Backspace - just update position
+      set({ userInput: input, currentIndex: input.length });
     }
     
     // Update live WPM
