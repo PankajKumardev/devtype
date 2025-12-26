@@ -54,7 +54,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
     bgSub: '#e0e0e0',
     text: '#1a1a1a',
     sub: '#666666',
-    main: '#2563eb',  // Bright blue instead of dark yellow
+    main: '#2563eb',
     error: '#dc3545',
     border: '#cccccc',
   },
