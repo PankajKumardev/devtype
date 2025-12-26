@@ -21,13 +21,13 @@ export default function Header() {
         <nav className="hidden md:flex items-center gap-6">
           <ThemeSelector />
           <div className="w-px h-5 bg-border" />
-          <Link href="/leaderboard" className="text-sm text-sub no-underline hover:text-text transition-colors">
+          <Link href="/leaderboard" prefetch={true} className="text-sm text-sub no-underline hover:text-text transition-colors">
             leaderboard
           </Link>
           
           {session ? (
             <>
-              <Link href="/dashboard" className="text-sm text-sub no-underline hover:text-text transition-colors">
+              <Link href="/dashboard" prefetch={true} className="text-sm text-sub no-underline hover:text-text transition-colors">
                 {session.user?.name || 'profile'}
               </Link>
               <button 
@@ -69,6 +69,7 @@ export default function Header() {
           <ThemeSelector />
           <Link 
             href="/leaderboard" 
+            prefetch={true}
             className="text-sm text-sub no-underline hover:text-text transition-colors"
             onClick={() => setMenuOpen(false)}
           >
@@ -79,6 +80,7 @@ export default function Header() {
             <>
               <Link 
                 href="/dashboard" 
+                prefetch={true}
                 className="text-sm text-sub no-underline hover:text-text transition-colors"
                 onClick={() => setMenuOpen(false)}
               >
