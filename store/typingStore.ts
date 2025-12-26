@@ -3,6 +3,11 @@ import { Language } from '@/lib/snippets';
 
 export type TestMode = 'timed' | 'practice';
 
+export interface ReplayFrame {
+  input: string;
+  timestamp: number; // ms since start
+}
+
 interface TypingState {
   // Config
   duration: number;
@@ -39,6 +44,12 @@ interface TypingState {
   // Personal best
   personalBest: number;
   isNewPersonalBest: boolean;
+  
+  // Replay
+  replayFrames: ReplayFrame[];
+  
+  // WPM History for graph
+  wpmHistory: { second: number; wpm: number; raw: number; errors: number }[];
   
   // Actions
   setDuration: (duration: number) => void;
@@ -83,6 +94,8 @@ export const useTypingStore = create<TypingState>((set, get) => ({
   lastPracticeDate: null,
   personalBest: 0,
   isNewPersonalBest: false,
+  replayFrames: [],
+  wpmHistory: [],
 
   setDuration: (duration) => {
     set({ duration, timeRemaining: duration });
@@ -133,11 +146,17 @@ export const useTypingStore = create<TypingState>((set, get) => ({
       liveWpm: 0,
       startTime: null,
       isNewPersonalBest: false,
+      replayFrames: [],
+      wpmHistory: [],
     });
   },
 
   updateInput: (input) => {
-    const { currentSnippet, userInput, keyErrors } = get();
+    const { currentSnippet, userInput, keyErrors, startTime, replayFrames } = get();
+    
+    // Record frame for replay
+    const timestamp = startTime ? Date.now() - startTime : 0;
+    const newFrames = [...replayFrames, { input, timestamp }];
     
     // Handle multiple characters (e.g., auto-indentation after Enter)
     if (input.length > userInput.length) {
@@ -168,10 +187,11 @@ export const useTypingStore = create<TypingState>((set, get) => ({
         incorrectChars: get().incorrectChars + incorrect,
         totalKeystrokes: get().totalKeystrokes + newCharsCount,
         keyErrors: newKeyErrors,
+        replayFrames: newFrames,
       });
     } else {
       // Backspace - just update position
-      set({ userInput: input, currentIndex: input.length });
+      set({ userInput: input, currentIndex: input.length, replayFrames: newFrames });
     }
     
     // Update live WPM
@@ -192,7 +212,32 @@ export const useTypingStore = create<TypingState>((set, get) => ({
   },
 
   tick: () => {
-    const { timeRemaining, calculateResults } = get();
+    const { timeRemaining, calculateResults, duration, startTime, correctChars, incorrectChars, totalKeystrokes, wpmHistory } = get();
+    
+    // Record WPM history point
+    if (startTime) {
+      const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+      const elapsedMinutes = elapsedSeconds / 60;
+      
+      if (elapsedMinutes > 0) {
+        const netChars = Math.max(0, correctChars - incorrectChars);
+        const wpm = Math.round((netChars / 5) / elapsedMinutes);
+        const raw = Math.round((totalKeystrokes / 5) / elapsedMinutes);
+        
+        // Only add if it's a new second
+        if (!wpmHistory.find(h => h.second === elapsedSeconds)) {
+          set({ 
+            wpmHistory: [...wpmHistory, { 
+              second: elapsedSeconds, 
+              wpm: Math.min(wpm, 300),
+              raw: Math.min(raw, 300),
+              errors: incorrectChars
+            }]
+          });
+        }
+      }
+    }
+    
     if (timeRemaining <= 1) {
       set({ timeRemaining: 0 });
       calculateResults();
