@@ -150,9 +150,10 @@ devtype-app/
 
 ## Keyboard Shortcuts
 
-- **Tab** - Insert 4 spaces
-- **Enter** - New line
-- **Esc** - Exit test
+- **Tab** - Focus restart button (like MonkeyType)
+- **Tab + Enter** - Restart test with new snippet
+- **Enter** - New line with auto-indentation
+- **Esc** - Exit test / Return to typing
 - **Space** - Resume from pause
 
 ## WPM & Accuracy

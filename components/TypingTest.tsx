@@ -30,8 +30,10 @@ export default function TypingTest({ onSnippetComplete, onExit }: TypingTestProp
   } = useTypingStore();
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const restartButtonRef = useRef<HTMLButtonElement>(null);
   const [practiceTime, setPracticeTime] = useState(0);
   const [showHints, setShowHints] = useState(true);
+  const [focusedButtonIndex, setFocusedButtonIndex] = useState(-1); // -1 = input, 1 = restart
 
   useEffect(() => {
     loadStreak();
@@ -147,25 +149,37 @@ export default function TypingTest({ onSnippetComplete, onExit }: TypingTestProp
     }
     if (e.key === 'Tab') {
       e.preventDefault();
-      // Check how many spaces the snippet expects (could be 2 or 4)
-      const nextPos = userInput.length;
-      let tabSpaces = '';
-      for (let i = nextPos; i < currentSnippet.length && i < nextPos + 4; i++) {
-        if (currentSnippet[i] === ' ') {
-          tabSpaces += ' ';
-        } else {
-          break;
-        }
+      // Tab goes directly to restart button (like MonkeyType)
+      if (isTestActive) {
+        setFocusedButtonIndex(1); // 1 = restart
+        restartButtonRef.current?.focus();
       }
-      // Default to 4 spaces if snippet doesn't have spaces at this position
-      const newValue = userInput + (tabSpaces || '    ');
-      if (newValue.length <= currentSnippet.length) updateInput(newValue);
       return;
     }
     if (e.key === 'Backspace') {
       e.preventDefault();
       if (userInput.length > 0) updateInput(userInput.slice(0, -1));
       return;
+    }
+  };
+
+  const handleRestartKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      resetTest();
+      onExit();
+      setFocusedButtonIndex(-1);
+      setTimeout(() => inputRef.current?.focus(), 50);
+    }
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      setFocusedButtonIndex(-1);
+      inputRef.current?.focus();
+    }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      setFocusedButtonIndex(-1);
+      inputRef.current?.focus();
     }
   };
 
@@ -235,8 +249,11 @@ export default function TypingTest({ onSnippetComplete, onExit }: TypingTestProp
               {isPaused ? 'resume' : 'pause'}
             </button>
             <button
-              onClick={() => { resetTest(); onExit(); focusInput(); }}
-              className="px-3 py-2 bg-bg-sub hover:bg-border border border-border rounded-lg text-xs md:text-sm text-sub hover:text-text cursor-pointer font-mono transition-colors"
+              ref={restartButtonRef}
+              onClick={() => { resetTest(); onExit(); focusInput(); setFocusedButtonIndex(-1); }}
+              onKeyDown={handleRestartKeyDown}
+              onBlur={() => setFocusedButtonIndex(-1)}
+              className={`px-3 py-2 bg-bg-sub hover:bg-border border rounded-lg text-xs md:text-sm cursor-pointer font-mono transition-colors ${focusedButtonIndex === 1 ? 'text-main border-main' : 'text-sub hover:text-text border-border'}`}
             >
               restart
             </button>
@@ -357,7 +374,7 @@ export default function TypingTest({ onSnippetComplete, onExit }: TypingTestProp
           {/* Keyboard shortcuts hint - hide on mobile */}
           {showHints && (
             <div className="hidden sm:flex flex-wrap gap-3 justify-center text-xs text-sub/70">
-              <span className="px-2 py-1 bg-bg-sub rounded">Tab → 4 spaces</span>
+              <span className="px-2 py-1 bg-bg-sub rounded">Tab + Enter → restart</span>
               <span className="px-2 py-1 bg-bg-sub rounded">Enter → new line</span>
               <span className="px-2 py-1 bg-bg-sub rounded">Esc → exit</span>
             </div>
