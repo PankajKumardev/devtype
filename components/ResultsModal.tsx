@@ -250,6 +250,7 @@ export default function ResultsModal({ onRestart, snippetsCompleted }: ResultsMo
               </div>
             )}
           </div>
+          {/* Bottom Stats Row */}
           <div className="flex flex-wrap justify-start gap-x-8 gap-y-3 text-xs">
             <div><p className="text-sub">test type</p><p className="text-main">{mode === 'practice' ? 'practice' : 'time ' + duration}</p><p className="text-main">{language}</p></div>
             <div><p className="text-sub">raw</p><p className="text-text text-lg">{rawWpm}</p></div>
@@ -259,7 +260,7 @@ export default function ResultsModal({ onRestart, snippetsCompleted }: ResultsMo
         </div>
 
         {/* Bottom content */}
-        <div>
+        <div className="pl-4">
           {/* Problem Keys */}
           {problemKeys.length > 0 && (
             <div className="mb-6">

@@ -116,6 +116,59 @@ export default function DashboardClient({ session }: DashboardClientProps) {
   const unlockedAchievements = getUnlockedAchievements(achievementStats);
   const lockedAchievements = achievements.filter(a => !unlockedAchievements.some(u => u.id === a.id));
 
+  // Export functions
+  const exportAsJSON = () => {
+    const exportData = {
+      user: {
+        name: session.user?.name,
+        email: session.user?.email,
+      },
+      stats: {
+        testsCompleted: stats.testsCompleted,
+        bestWpm: stats.bestWpm || personalBest,
+        avgWpm,
+        avgAccuracy: stats.avgAccuracy,
+        dailyStreak,
+      },
+      scores: scores.map(s => ({
+        wpm: s.wpm,
+        accuracy: s.accuracy,
+        language: s.language,
+        duration: s.duration,
+        date: new Date(s.timestamp).toISOString(),
+      })),
+      exportedAt: new Date().toISOString(),
+    };
+    
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `devtype-history-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportAsCSV = () => {
+    const headers = ['Date', 'WPM', 'Accuracy', 'Language', 'Duration'];
+    const rows = scores.map(s => [
+      new Date(s.timestamp).toISOString(),
+      s.wpm,
+      s.accuracy,
+      s.language,
+      s.duration,
+    ]);
+    
+    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `devtype-history-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen font-mono bg-bg">
       {/* Header */}
@@ -146,11 +199,30 @@ export default function DashboardClient({ session }: DashboardClientProps) {
             <h1 className="text-xl md:text-3xl font-normal text-main">{session.user?.name}</h1>
             <p className="text-sub text-xs md:text-base">{session.user?.email}</p>
           </div>
-          {dailyStreak > 0 && (
-            <div className="ml-auto px-3 py-1.5 bg-bg-sub rounded-lg border border-border">
-              <span className="text-sm text-sub">{dailyStreak} day streak</span>
+          <div className="ml-auto flex items-center gap-2">
+            {dailyStreak > 0 && (
+              <div className="px-3 py-1.5 bg-bg-sub rounded-lg border border-border">
+                <span className="text-sm text-sub">{dailyStreak} day streak</span>
+              </div>
+            )}
+            {/* Export Buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={exportAsJSON}
+                disabled={scores.length === 0}
+                className="px-3 py-1.5 bg-bg-sub rounded-lg border border-border text-xs text-sub hover:text-text hover:border-main transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                export JSON
+              </button>
+              <button
+                onClick={exportAsCSV}
+                disabled={scores.length === 0}
+                className="px-3 py-1.5 bg-bg-sub rounded-lg border border-border text-xs text-sub hover:text-text hover:border-main transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                export CSV
+              </button>
             </div>
-          )}
+          </div>
         </div>
 
         {/* Main Stats */}
