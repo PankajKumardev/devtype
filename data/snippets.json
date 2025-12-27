@@ -9,7 +9,12 @@
         "function mergeSort(arr: number[]): number[] {\n    if (arr.length <= 1) return arr;\n    const mid = Math.floor(arr.length / 2);\n    const left = mergeSort(arr.slice(0, mid));\n    const right = mergeSort(arr.slice(mid));\n    const result: number[] = [];\n    let i = 0, j = 0;\n    while (i < left.length && j < right.length) {\n        result.push(left[i] < right[j] ? left[i++] : right[j++]);\n    }\n    return [...result, ...left.slice(i), ...right.slice(j)];\n}",
         "function findMax(arr: number[]): number {\n    if (arr.length === 0) return -Infinity;\n    let max = arr[0];\n    for (let i = 1; i < arr.length; i++) {\n        if (arr[i] > max) {\n            max = arr[i];\n        }\n    }\n    return max;\n}",
         "function bubbleSort(arr: number[]): number[] {\n    const result = [...arr];\n    const n = result.length;\n    for (let i = 0; i < n - 1; i++) {\n        for (let j = 0; j < n - i - 1; j++) {\n            if (result[j] > result[j + 1]) {\n                const temp = result[j];\n                result[j] = result[j + 1];\n                result[j + 1] = temp;\n            }\n        }\n    }\n    return result;\n}",
-        "function countOccurrences(arr: string[], target: string): number {\n    let count = 0;\n    for (let i = 0; i < arr.length; i++) {\n        if (arr[i] === target) {\n            count++;\n        }\n    }\n    return count;\n}"
+        "function countOccurrences(arr: string[], target: string): number {\n    let count = 0;\n    for (let i = 0; i < arr.length; i++) {\n        if (arr[i] === target) {\n            count++;\n        }\n    }\n    return count;\n}",
+        "function sumArray(arr: number[]): number {\n    let sum = 0;\n    for (let i = 0; i < arr.length; i++) {\n        sum += arr[i];\n    }\n    return sum;\n}",
+        "function isEven(n: number): boolean {\n    return n % 2 === 0;\n}",
+        "function countVowels(str: string): number {\n    const vowels = 'aeiouAEIOU';\n    let count = 0;\n    for (let i = 0; i < str.length; i++) {\n        if (vowels.includes(str[i])) {\n            count++;\n        }\n    }\n    return count;\n}",
+        "function power(base: number, exp: number): number {\n    let result = 1;\n    for (let i = 0; i < exp; i++) {\n        result *= base;\n    }\n    return result;\n}",
+        "function sumOfDigits(n: number): number {\n    let sum = 0;\n    n = Math.abs(n);\n    while (n > 0) {\n        sum += n % 10;\n        n = Math.floor(n / 10);\n    }\n    return sum;\n}"
     ],
     "javascript": [
         "function binarySearch(arr, target) {\n    let left = 0;\n    let right = arr.length - 1;\n    while (left <= right) {\n        const mid = Math.floor((left + right) / 2);\n        if (arr[mid] === target) return mid;\n        if (arr[mid] < target) left = mid + 1;\n        else right = mid - 1;\n    }\n    return -1;\n}",
@@ -21,7 +26,12 @@
         "function mergeSort(arr) {\n    if (arr.length <= 1) return arr;\n    const mid = Math.floor(arr.length / 2);\n    const left = mergeSort(arr.slice(0, mid));\n    const right = mergeSort(arr.slice(mid));\n    const result = [];\n    let i = 0, j = 0;\n    while (i < left.length && j < right.length) {\n        result.push(left[i] < right[j] ? left[i++] : right[j++]);\n    }\n    return [...result, ...left.slice(i), ...right.slice(j)];\n}",
         "function findMax(arr) {\n    if (arr.length === 0) return null;\n    let max = arr[0];\n    for (let i = 1; i < arr.length; i++) {\n        if (arr[i] > max) {\n            max = arr[i];\n        }\n    }\n    return max;\n}",
         "function bubbleSort(arr) {\n    const result = [...arr];\n    const n = result.length;\n    for (let i = 0; i < n - 1; i++) {\n        for (let j = 0; j < n - i - 1; j++) {\n            if (result[j] > result[j + 1]) {\n                const temp = result[j];\n                result[j] = result[j + 1];\n                result[j + 1] = temp;\n            }\n        }\n    }\n    return result;\n}",
-        "function selectionSort(arr) {\n    const result = [...arr];\n    const n = result.length;\n    for (let i = 0; i < n - 1; i++) {\n        let minIdx = i;\n        for (let j = i + 1; j < n; j++) {\n            if (result[j] < result[minIdx]) {\n                minIdx = j;\n            }\n        }\n        const temp = result[i];\n        result[i] = result[minIdx];\n        result[minIdx] = temp;\n    }\n    return result;\n}"
+        "function selectionSort(arr) {\n    const result = [...arr];\n    const n = result.length;\n    for (let i = 0; i < n - 1; i++) {\n        let minIdx = i;\n        for (let j = i + 1; j < n; j++) {\n            if (result[j] < result[minIdx]) {\n                minIdx = j;\n            }\n        }\n        const temp = result[i];\n        result[i] = result[minIdx];\n        result[minIdx] = temp;\n    }\n    return result;\n}",
+        "function sumArray(arr) {\n    let sum = 0;\n    for (let i = 0; i < arr.length; i++) {\n        sum += arr[i];\n    }\n    return sum;\n}",
+        "function isEven(n) {\n    return n % 2 === 0;\n}",
+        "function countVowels(str) {\n    const vowels = 'aeiouAEIOU';\n    let count = 0;\n    for (let i = 0; i < str.length; i++) {\n        if (vowels.includes(str[i])) {\n            count++;\n        }\n    }\n    return count;\n}",
+        "function power(base, exp) {\n    let result = 1;\n    for (let i = 0; i < exp; i++) {\n        result *= base;\n    }\n    return result;\n}",
+        "function sumOfDigits(n) {\n    let sum = 0;\n    n = Math.abs(n);\n    while (n > 0) {\n        sum += n % 10;\n        n = Math.floor(n / 10);\n    }\n    return sum;\n}"
     ],
     "python": [
         "def binary_search(arr, target):\n    left = 0\n    right = len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1",
@@ -33,7 +43,12 @@
         "def merge_sort(arr):\n    if len(arr) <= 1:\n        return arr\n    mid = len(arr) // 2\n    left = merge_sort(arr[:mid])\n    right = merge_sort(arr[mid:])\n    result = []\n    i = j = 0\n    while i < len(left) and j < len(right):\n        if left[i] < right[j]:\n            result.append(left[i])\n            i += 1\n        else:\n            result.append(right[j])\n            j += 1\n    return result + left[i:] + right[j:]",
         "def bubble_sort(arr):\n    result = arr.copy()\n    n = len(result)\n    for i in range(n - 1):\n        for j in range(n - i - 1):\n            if result[j] > result[j + 1]:\n                result[j], result[j + 1] = result[j + 1], result[j]\n    return result",
         "def selection_sort(arr):\n    result = arr.copy()\n    n = len(result)\n    for i in range(n - 1):\n        min_idx = i\n        for j in range(i + 1, n):\n            if result[j] < result[min_idx]:\n                min_idx = j\n        result[i], result[min_idx] = result[min_idx], result[i]\n    return result",
-        "def find_max(arr):\n    if not arr:\n        return None\n    max_val = arr[0]\n    for i in range(1, len(arr)):\n        if arr[i] > max_val:\n            max_val = arr[i]\n    return max_val"
+        "def find_max(arr):\n    if not arr:\n        return None\n    max_val = arr[0]\n    for i in range(1, len(arr)):\n        if arr[i] > max_val:\n            max_val = arr[i]\n    return max_val",
+        "def sum_array(arr):\n    total = 0\n    for num in arr:\n        total += num\n    return total",
+        "def is_even(n):\n    return n % 2 == 0",
+        "def count_vowels(s):\n    vowels = 'aeiouAEIOU'\n    count = 0\n    for char in s:\n        if char in vowels:\n            count += 1\n    return count",
+        "def power(base, exp):\n    result = 1\n    for i in range(exp):\n        result *= base\n    return result",
+        "def sum_of_digits(n):\n    total = 0\n    n = abs(n)\n    while n > 0:\n        total += n % 10\n        n = n // 10\n    return total"
     ],
     "rust": [
         "fn binary_search(arr: &[i32], target: i32) -> i32 {\n    let mut left = 0;\n    let mut right = arr.len() as i32 - 1;\n    while left <= right {\n        let mid = left + (right - left) / 2;\n        if arr[mid as usize] == target {\n            return mid;\n        } else if arr[mid as usize] < target {\n            left = mid + 1;\n        } else {\n            right = mid - 1;\n        }\n    }\n    -1\n}",
@@ -45,7 +60,12 @@
         "fn selection_sort(arr: &mut [i32]) {\n    let n = arr.len();\n    for i in 0..n - 1 {\n        let mut min_idx = i;\n        for j in i + 1..n {\n            if arr[j] < arr[min_idx] {\n                min_idx = j;\n            }\n        }\n        arr.swap(i, min_idx);\n    }\n}",
         "fn find_max(arr: &[i32]) -> Option<i32> {\n    if arr.is_empty() {\n        return None;\n    }\n    let mut max = arr[0];\n    for &num in arr.iter().skip(1) {\n        if num > max {\n            max = num;\n        }\n    }\n    Some(max)\n}",
         "fn gcd(mut a: u64, mut b: u64) -> u64 {\n    while b != 0 {\n        let temp = b;\n        b = a % b;\n        a = temp;\n    }\n    a\n}",
-        "fn count_occurrences(arr: &[i32], target: i32) -> usize {\n    let mut count = 0;\n    for &num in arr {\n        if num == target {\n            count += 1;\n        }\n    }\n    count\n}"
+        "fn count_occurrences(arr: &[i32], target: i32) -> usize {\n    let mut count = 0;\n    for &num in arr {\n        if num == target {\n            count += 1;\n        }\n    }\n    count\n}",
+        "fn sum_array(arr: &[i32]) -> i32 {\n    let mut sum = 0;\n    for &num in arr {\n        sum += num;\n    }\n    sum\n}",
+        "fn is_even(n: i32) -> bool {\n    n % 2 == 0\n}",
+        "fn power(base: i32, exp: u32) -> i32 {\n    let mut result = 1;\n    for _ in 0..exp {\n        result *= base;\n    }\n    result\n}",
+        "fn sum_of_digits(mut n: i32) -> i32 {\n    let mut sum = 0;\n    if n < 0 {\n        n = -n;\n    }\n    while n > 0 {\n        sum += n % 10;\n        n = n / 10;\n    }\n    sum\n}",
+        "fn find_min(arr: &[i32]) -> i32 {\n    let mut min = arr[0];\n    for i in 1..arr.len() {\n        if arr[i] < min {\n            min = arr[i];\n        }\n    }\n    min\n}"
     ],
     "go": [
         "func binarySearch(arr []int, target int) int {\n    left := 0\n    right := len(arr) - 1\n    for left <= right {\n        mid := left + (right-left)/2\n        if arr[mid] == target {\n            return mid\n        } else if arr[mid] < target {\n            left = mid + 1\n        } else {\n            right = mid - 1\n        }\n    }\n    return -1\n}",
@@ -57,7 +77,12 @@
         "func selectionSort(arr []int) []int {\n    result := make([]int, len(arr))\n    copy(result, arr)\n    n := len(result)\n    for i := 0; i < n-1; i++ {\n        minIdx := i\n        for j := i + 1; j < n; j++ {\n            if result[j] < result[minIdx] {\n                minIdx = j\n            }\n        }\n        result[i], result[minIdx] = result[minIdx], result[i]\n    }\n    return result\n}",
         "func findMax(arr []int) int {\n    if len(arr) == 0 {\n        return 0\n    }\n    max := arr[0]\n    for i := 1; i < len(arr); i++ {\n        if arr[i] > max {\n            max = arr[i]\n        }\n    }\n    return max\n}",
         "func gcd(a, b int) int {\n    for b != 0 {\n        temp := b\n        b = a % b\n        a = temp\n    }\n    return a\n}",
-        "func countOccurrences(arr []int, target int) int {\n    count := 0\n    for _, num := range arr {\n        if num == target {\n            count++\n        }\n    }\n    return count\n}"
+        "func countOccurrences(arr []int, target int) int {\n    count := 0\n    for _, num := range arr {\n        if num == target {\n            count++\n        }\n    }\n    return count\n}",
+        "func sumArray(arr []int) int {\n    sum := 0\n    for _, num := range arr {\n        sum += num\n    }\n    return sum\n}",
+        "func isEven(n int) bool {\n    return n % 2 == 0\n}",
+        "func countVowels(s string) int {\n    vowels := \"aeiouAEIOU\"\n    count := 0\n    for _, char := range s {\n        if strings.ContainsRune(vowels, char) {\n            count++\n        }\n    }\n    return count\n}",
+        "func power(base, exp int) int {\n    result := 1\n    for i := 0; i < exp; i++ {\n        result *= base\n    }\n    return result\n}",
+        "func sumOfDigits(n int) int {\n    sum := 0\n    if n < 0 {\n        n = -n\n    }\n    for n > 0 {\n        sum += n % 10\n        n = n / 10\n    }\n    return sum\n}"
     ],
     "java": [
         "public int binarySearch(int[] arr, int target) {\n    int left = 0;\n    int right = arr.length - 1;\n    while (left <= right) {\n        int mid = left + (right - left) / 2;\n        if (arr[mid] == target) {\n            return mid;\n        } else if (arr[mid] < target) {\n            left = mid + 1;\n        } else {\n            right = mid - 1;\n        }\n    }\n    return -1;\n}",
@@ -69,7 +94,12 @@
         "public void selectionSort(int[] arr) {\n    int n = arr.length;\n    for (int i = 0; i < n - 1; i++) {\n        int minIdx = i;\n        for (int j = i + 1; j < n; j++) {\n            if (arr[j] < arr[minIdx]) {\n                minIdx = j;\n            }\n        }\n        int temp = arr[i];\n        arr[i] = arr[minIdx];\n        arr[minIdx] = temp;\n    }\n}",
         "public int findMax(int[] arr) {\n    if (arr.length == 0) {\n        return Integer.MIN_VALUE;\n    }\n    int max = arr[0];\n    for (int i = 1; i < arr.length; i++) {\n        if (arr[i] > max) {\n            max = arr[i];\n        }\n    }\n    return max;\n}",
         "public int gcd(int a, int b) {\n    while (b != 0) {\n        int temp = b;\n        b = a % b;\n        a = temp;\n    }\n    return a;\n}",
-        "public int countOccurrences(int[] arr, int target) {\n    int count = 0;\n    for (int i = 0; i < arr.length; i++) {\n        if (arr[i] == target) {\n            count++;\n        }\n    }\n    return count;\n}"
+        "public int countOccurrences(int[] arr, int target) {\n    int count = 0;\n    for (int i = 0; i < arr.length; i++) {\n        if (arr[i] == target) {\n            count++;\n        }\n    }\n    return count;\n}",
+        "public int sumArray(int[] arr) {\n    int sum = 0;\n    for (int i = 0; i < arr.length; i++) {\n        sum += arr[i];\n    }\n    return sum;\n}",
+        "public boolean isEven(int n) {\n    return n % 2 == 0;\n}",
+        "public int countVowels(String s) {\n    String vowels = \"aeiouAEIOU\";\n    int count = 0;\n    for (int i = 0; i < s.length(); i++) {\n        if (vowels.indexOf(s.charAt(i)) != -1) {\n            count++;\n        }\n    }\n    return count;\n}",
+        "public int power(int base, int exp) {\n    int result = 1;\n    for (int i = 0; i < exp; i++) {\n        result *= base;\n    }\n    return result;\n}",
+        "public int sumOfDigits(int n) {\n    int sum = 0;\n    n = Math.abs(n);\n    while (n > 0) {\n        sum += n % 10;\n        n = n / 10;\n    }\n    return sum;\n}"
     ],
     "csharp": [
         "public int BinarySearch(int[] arr, int target) {\n    int left = 0;\n    int right = arr.Length - 1;\n    while (left <= right) {\n        int mid = left + (right - left) / 2;\n        if (arr[mid] == target) {\n            return mid;\n        } else if (arr[mid] < target) {\n            left = mid + 1;\n        } else {\n            right = mid - 1;\n        }\n    }\n    return -1;\n}",
@@ -81,7 +111,12 @@
         "public void SelectionSort(int[] arr) {\n    int n = arr.Length;\n    for (int i = 0; i < n - 1; i++) {\n        int minIdx = i;\n        for (int j = i + 1; j < n; j++) {\n            if (arr[j] < arr[minIdx]) {\n                minIdx = j;\n            }\n        }\n        int temp = arr[i];\n        arr[i] = arr[minIdx];\n        arr[minIdx] = temp;\n    }\n}",
         "public int FindMax(int[] arr) {\n    if (arr.Length == 0) {\n        return int.MinValue;\n    }\n    int max = arr[0];\n    for (int i = 1; i < arr.Length; i++) {\n        if (arr[i] > max) {\n            max = arr[i];\n        }\n    }\n    return max;\n}",
         "public int Gcd(int a, int b) {\n    while (b != 0) {\n        int temp = b;\n        b = a % b;\n        a = temp;\n    }\n    return a;\n}",
-        "public int CountOccurrences(int[] arr, int target) {\n    int count = 0;\n    for (int i = 0; i < arr.Length; i++) {\n        if (arr[i] == target) {\n            count++;\n        }\n    }\n    return count;\n}"
+        "public int CountOccurrences(int[] arr, int target) {\n    int count = 0;\n    for (int i = 0; i < arr.Length; i++) {\n        if (arr[i] == target) {\n            count++;\n        }\n    }\n    return count;\n}",
+        "public int SumArray(int[] arr) {\n    int sum = 0;\n    for (int i = 0; i < arr.Length; i++) {\n        sum += arr[i];\n    }\n    return sum;\n}",
+        "public bool IsEven(int n) {\n    return n % 2 == 0;\n}",
+        "public int CountVowels(string s) {\n    string vowels = \"aeiouAEIOU\";\n    int count = 0;\n    for (int i = 0; i < s.Length; i++) {\n        if (vowels.Contains(s[i])) {\n            count++;\n        }\n    }\n    return count;\n}",
+        "public int Power(int baseNum, int exp) {\n    int result = 1;\n    for (int i = 0; i < exp; i++) {\n        result *= baseNum;\n    }\n    return result;\n}",
+        "public int SumOfDigits(int n) {\n    int sum = 0;\n    n = Math.Abs(n);\n    while (n > 0) {\n        sum += n % 10;\n        n = n / 10;\n    }\n    return sum;\n}"
     ],
     "cpp": [
         "int binarySearch(vector<int>& arr, int target) {\n    int left = 0;\n    int right = arr.size() - 1;\n    while (left <= right) {\n        int mid = left + (right - left) / 2;\n        if (arr[mid] == target) {\n            return mid;\n        } else if (arr[mid] < target) {\n            left = mid + 1;\n        } else {\n            right = mid - 1;\n        }\n    }\n    return -1;\n}",
@@ -93,6 +128,11 @@
         "void selectionSort(vector<int>& arr) {\n    int n = arr.size();\n    for (int i = 0; i < n - 1; i++) {\n        int minIdx = i;\n        for (int j = i + 1; j < n; j++) {\n            if (arr[j] < arr[minIdx]) {\n                minIdx = j;\n            }\n        }\n        swap(arr[i], arr[minIdx]);\n    }\n}",
         "int findMax(vector<int>& arr) {\n    if (arr.empty()) {\n        return INT_MIN;\n    }\n    int maxVal = arr[0];\n    for (int i = 1; i < arr.size(); i++) {\n        if (arr[i] > maxVal) {\n            maxVal = arr[i];\n        }\n    }\n    return maxVal;\n}",
         "int gcd(int a, int b) {\n    while (b != 0) {\n        int temp = b;\n        b = a % b;\n        a = temp;\n    }\n    return a;\n}",
-        "int countOccurrences(vector<int>& arr, int target) {\n    int count = 0;\n    for (int i = 0; i < arr.size(); i++) {\n        if (arr[i] == target) {\n            count++;\n        }\n    }\n    return count;\n}"
+        "int countOccurrences(vector<int>& arr, int target) {\n    int count = 0;\n    for (int i = 0; i < arr.size(); i++) {\n        if (arr[i] == target) {\n            count++;\n        }\n    }\n    return count;\n}",
+        "int sumArray(int arr[], int n) {\n    int sum = 0;\n    for (int i = 0; i < n; i++) {\n        sum += arr[i];\n    }\n    return sum;\n}",
+        "bool isEven(int n) {\n    return n % 2 == 0;\n}",
+        "int countVowels(string s) {\n    string vowels = \"aeiouAEIOU\";\n    int count = 0;\n    for (int i = 0; i < s.length(); i++) {\n        if (vowels.find(s[i]) != string::npos) {\n            count++;\n        }\n    }\n    return count;\n}",
+        "int power(int base, int exp) {\n    int result = 1;\n    for (int i = 0; i < exp; i++) {\n        result *= base;\n    }\n    return result;\n}",
+        "int sumOfDigits(int n) {\n    int sum = 0;\n    if (n < 0) {\n        n = -n;\n    }\n    while (n > 0) {\n        sum += n % 10;\n        n = n / 10;\n    }\n    return sum;\n}"
     ]
 }

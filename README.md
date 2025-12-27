@@ -12,7 +12,7 @@ A typing speed application designed for programmers. Practice typing with real c
 ## Features
 
 ### Core Features
-- **Real Code Snippets** - Practice with TypeScript, JavaScript, Python, Rust, Go, Java, and C++
+- **Real Code Snippets** - Practice with TypeScript, JavaScript, Python, Rust, Go, Java, C#, and C++
 - **Multiple Themes** - Dark and light themes (default, mocha, nord, ocean, forest, sunset)
 - **Timed & Practice Modes** - Choose 15s, 30s, 60s, 120s, or custom duration; unlimited practice mode
 - **Live WPM Counter** - Real-time speed tracking with error penalty
