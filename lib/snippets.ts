@@ -1,8 +1,8 @@
 import snippetsData from '@/data/snippets.json';
 
-export type Language = 'typescript' | 'javascript' | 'python' | 'rust' | 'go' | 'java' | 'cpp';
+export type Language = 'typescript' | 'javascript' | 'python' | 'rust' | 'go' | 'java' | 'csharp' | 'cpp';
 
-export const languages: Language[] = ['typescript', 'javascript', 'python', 'rust', 'go', 'java', 'cpp'];
+export const languages: Language[] = ['typescript', 'javascript', 'python', 'rust', 'go', 'java', 'csharp', 'cpp'];
 
 const snippets: Record<Language, string[]> = snippetsData as Record<Language, string[]>;
 
