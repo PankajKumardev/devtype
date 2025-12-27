@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { languages } from '@/lib/snippets';
@@ -21,42 +21,88 @@ interface LeaderboardEntry {
 export default function LeaderboardPage() {
   const { leaderboard: cachedLeaderboard, setLeaderboardData, shouldRefresh } = useDataCache();
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
-  const cached = cachedLeaderboard[selectedLanguage];
+  const [selectedDuration, setSelectedDuration] = useState<string>('all');
+  const cacheKey = `${selectedLanguage}_${selectedDuration}`;
+  const cached = cachedLeaderboard[cacheKey];
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(cached?.entries || []);
   const [loading, setLoading] = useState(!cached);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // If we have cached data for this language, use it immediately
-    const cachedData = cachedLeaderboard[selectedLanguage];
+    // If we have cached data for this combination, use it immediately
+    const cachedData = cachedLeaderboard[cacheKey];
     if (cachedData) {
       setLeaderboard(cachedData.entries);
       setLoading(false);
+      setHasMore(true); // Reset hasMore when filter changes
       
       // Check if we should refresh
       if (shouldRefresh(cachedData.lastFetched)) {
         fetchLeaderboard();
       }
     } else {
-      // No cache for this language, fetch immediately
+      // No cache, fetch immediately
+      setLoading(true);
+      setHasMore(true);
       fetchLeaderboard();
     }
-  }, [selectedLanguage]);
+  }, [selectedLanguage, selectedDuration]);
+
+  // Infinite scroll observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore && !loading) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+    
+    return () => observer.disconnect();
+  }, [hasMore, loadingMore, loading, leaderboard.length]);
 
   const fetchLeaderboard = async () => {
     try {
       const response = await fetch(
-        `/api/leaderboard?language=${selectedLanguage}&limit=50`
+        `/api/leaderboard?language=${selectedLanguage}&duration=${selectedDuration}&limit=50&offset=0`
       );
       const data = await response.json();
       const entries = data.leaderboard || [];
       
       setLeaderboard(entries);
-      setLeaderboardData(selectedLanguage, entries);
+      setHasMore(data.hasMore || false);
+      setLeaderboardData(cacheKey, entries);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
       setLoading(false);
     }
+  };
+
+  const loadMore = async () => {
+    if (loadingMore || !hasMore) return;
+    
+    setLoadingMore(true);
+    try {
+      const response = await fetch(
+        `/api/leaderboard?language=${selectedLanguage}&duration=${selectedDuration}&limit=50&offset=${leaderboard.length}`
+      );
+      const data = await response.json();
+      const newEntries = data.leaderboard || [];
+      
+      setLeaderboard(prev => [...prev, ...newEntries]);
+      setHasMore(data.hasMore || false);
+    } catch (error) {
+      console.error('Error loading more:', error);
+    }
+    setLoadingMore(false);
   };
 
   return (
@@ -78,7 +124,7 @@ export default function LeaderboardPage() {
         <h1 className="text-3xl md:text-5xl font-normal text-main mb-6 md:mb-10">leaderboard</h1>
 
         {/* Language Filters */}
-        <div className="flex flex-wrap items-center gap-1.5 md:gap-2 mb-6 md:mb-10">
+        <div className="flex flex-wrap items-center gap-1.5 md:gap-2 mb-4">
           <span className="text-xs md:text-sm text-sub mr-1 md:mr-2">language:</span>
           <button
             onClick={() => setSelectedLanguage('all')}
@@ -95,6 +141,21 @@ export default function LeaderboardPage() {
                 ${selectedLanguage === lang ? 'bg-bg-sub text-main' : 'bg-transparent text-sub hover:text-text hover:bg-bg-sub/50'}`}
             >
               {lang}
+            </button>
+          ))}
+        </div>
+
+        {/* Time Duration Filters */}
+        <div className="flex flex-wrap items-center gap-1.5 md:gap-2 mb-6 md:mb-10">
+          <span className="text-xs md:text-sm text-sub mr-1 md:mr-2">time:</span>
+          {['all', '15', '30', '60', '120'].map((time) => (
+            <button
+              key={time}
+              onClick={() => setSelectedDuration(time)}
+              className={`px-3 md:px-5 py-1.5 md:py-2.5 text-xs md:text-sm rounded-lg border-none cursor-pointer font-mono transition-colors
+                ${selectedDuration === time ? 'bg-bg-sub text-main' : 'bg-transparent text-sub hover:text-text hover:bg-bg-sub/50'}`}
+            >
+              {time === 'all' ? 'all' : `${time}s`}
             </button>
           ))}
         </div>
@@ -197,6 +258,16 @@ export default function LeaderboardPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+            
+            {/* Load More Indicator */}
+            <div ref={loadMoreRef} className="py-6 text-center">
+              {loadingMore && (
+                <span className="text-sub text-sm">loading more...</span>
+              )}
+              {!hasMore && leaderboard.length > 0 && (
+                <span className="text-sub/50 text-xs">end of leaderboard</span>
+              )}
             </div>
           </>
         )}
