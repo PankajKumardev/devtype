@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useThemeStore } from '@/store/themeStore';
 
 interface HeatmapCalendarProps {
   activityData: { date: string; count: number }[];
@@ -9,6 +10,9 @@ interface HeatmapCalendarProps {
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export default function HeatmapCalendar({ activityData }: HeatmapCalendarProps) {
+  const { getColors } = useThemeStore();
+  const themeColors = getColors();
+
   const { weeks, maxCount, monthLabels } = useMemo(() => {
     const currentYear = new Date().getFullYear();
     
@@ -79,16 +83,31 @@ export default function HeatmapCalendar({ activityData }: HeatmapCalendarProps) 
     return { weeks, maxCount, monthLabels };
   }, [activityData]);
 
+  // Use theme's main color for the heatmap
+  const mainColor = themeColors.main;
+  
+  // Convert hex to RGB for opacity
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : { r: 226, g: 183, b: 20 };
+  };
+  
+  const rgb = hexToRgb(mainColor);
+
   const getColor = (count: number): string => {
     if (count === -1) return 'transparent';
     if (count === 0) return 'var(--color-bg)';
     
     const intensity = Math.min(count / Math.max(maxCount, 4), 1);
     
-    if (intensity <= 0.25) return 'rgba(226, 183, 20, 0.3)';
-    if (intensity <= 0.5) return 'rgba(226, 183, 20, 0.5)';
-    if (intensity <= 0.75) return 'rgba(226, 183, 20, 0.7)';
-    return 'rgba(226, 183, 20, 0.95)';
+    if (intensity <= 0.25) return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`;
+    if (intensity <= 0.5) return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`;
+    if (intensity <= 0.75) return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.7)`;
+    return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.95)`;
   };
 
   const totalTests = activityData.reduce((sum, d) => sum + d.count, 0);
@@ -159,10 +178,10 @@ export default function HeatmapCalendar({ activityData }: HeatmapCalendarProps) 
       <div className="flex items-center justify-end gap-1 mt-3 text-[10px] sm:text-xs text-sub">
         <span>Less</span>
         <div className="w-[10px] h-[10px] rounded-sm" style={{ backgroundColor: 'var(--color-bg)' }} />
-        <div className="w-[10px] h-[10px] rounded-sm" style={{ backgroundColor: 'rgba(226, 183, 20, 0.3)' }} />
-        <div className="w-[10px] h-[10px] rounded-sm" style={{ backgroundColor: 'rgba(226, 183, 20, 0.5)' }} />
-        <div className="w-[10px] h-[10px] rounded-sm" style={{ backgroundColor: 'rgba(226, 183, 20, 0.7)' }} />
-        <div className="w-[10px] h-[10px] rounded-sm" style={{ backgroundColor: 'rgba(226, 183, 20, 0.95)' }} />
+        <div className="w-[10px] h-[10px] rounded-sm" style={{ backgroundColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` }} />
+        <div className="w-[10px] h-[10px] rounded-sm" style={{ backgroundColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)` }} />
+        <div className="w-[10px] h-[10px] rounded-sm" style={{ backgroundColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.7)` }} />
+        <div className="w-[10px] h-[10px] rounded-sm" style={{ backgroundColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.95)` }} />
         <span>More</span>
       </div>
     </div>

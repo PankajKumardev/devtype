@@ -3,6 +3,7 @@ import { create } from 'zustand';
 interface LeaderboardEntry {
   rank: number;
   name: string;
+  username?: string;
   image?: string;
   wpm: number;
   accuracy: number;

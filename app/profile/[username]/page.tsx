@@ -28,6 +28,109 @@ interface ProfileData {
   }[];
 }
 
+const THEMES = [
+  { id: 'dark', name: 'Dark', bg: '#323437' },
+  { id: 'ocean', name: 'Ocean', bg: '#1a2634' },
+  { id: 'forest', name: 'Forest', bg: '#1e2d24' },
+  { id: 'sunset', name: 'Sunset', bg: '#2d1f2f' },
+  { id: 'light', name: 'Light', bg: '#f5f5f5' },
+];
+
+function EmbedSection({ username }: { username: string }) {
+  const [selectedTheme, setSelectedTheme] = useState('dark');
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const copyToClipboard = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(id);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const embedUrl = `https://devtype.pankajk.tech/api/embed/${username}${selectedTheme !== 'dark' ? `?theme=${selectedTheme}` : ''}`;
+  const profileUrl = `https://devtype.pankajk.tech/profile/${username}`;
+  const markdownCode = `[![DevType Activity](${embedUrl})](${profileUrl})`;
+
+  return (
+    <div className="mt-8 bg-bg-sub rounded-xl p-4 md:p-6 border border-border">
+      <h3 className="text-sm md:text-base text-text mb-4">share & embed</h3>
+      
+      <div className="space-y-4">
+        {/* Profile URL */}
+        <div>
+          <p className="text-xs text-sub mb-2">profile url</p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 text-xs text-main bg-bg px-3 py-2 rounded-lg overflow-x-auto">
+              {profileUrl}
+            </code>
+            <button
+              onClick={() => copyToClipboard(profileUrl, 'url')}
+              className="px-3 py-2 bg-bg rounded-lg text-xs text-sub hover:text-text transition-colors border-none cursor-pointer"
+            >
+              {copied === 'url' ? '✓' : 'copy'}
+            </button>
+          </div>
+        </div>
+        
+        {/* Theme Selector */}
+        <div>
+          <p className="text-xs text-sub mb-2">select theme for embed</p>
+          <div className="flex flex-wrap gap-2">
+            {THEMES.map((theme) => (
+              <button
+                key={theme.id}
+                onClick={() => setSelectedTheme(theme.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs border-none cursor-pointer transition-all flex items-center gap-2
+                  ${selectedTheme === theme.id 
+                    ? 'bg-main text-bg font-medium' 
+                    : 'bg-bg text-sub hover:text-text'}`}
+                style={selectedTheme !== theme.id ? {} : { color: '#1a1a1a' }}
+              >
+                <span 
+                  className="w-3 h-3 rounded-sm border border-border" 
+                  style={{ backgroundColor: theme.bg }}
+                />
+                {theme.name}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        {/* Markdown Embed Code */}
+        <div>
+          <p className="text-xs text-sub mb-2">embed in github readme (markdown)</p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 text-xs text-main bg-bg px-3 py-2 rounded-lg overflow-x-auto whitespace-nowrap">
+              {markdownCode}
+            </code>
+            <button
+              onClick={() => copyToClipboard(markdownCode, 'markdown')}
+              className="px-3 py-2 bg-bg rounded-lg text-xs text-sub hover:text-text transition-colors border-none cursor-pointer"
+            >
+              {copied === 'markdown' ? '✓' : 'copy'}
+            </button>
+          </div>
+        </div>
+        
+        {/* Preview */}
+        <div>
+          <p className="text-xs text-sub mb-2">preview</p>
+          <div 
+            className="rounded-lg p-3 overflow-x-auto"
+            style={{ backgroundColor: THEMES.find(t => t.id === selectedTheme)?.bg }}
+          >
+            <img 
+              src={`/api/embed/${username}?theme=${selectedTheme}`} 
+              alt={`DevType Activity (${selectedTheme})`}
+              className="max-w-full h-auto"
+              key={selectedTheme}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = use(params);
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -107,23 +210,23 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
       <main className="max-w-4xl mx-auto px-4 md:px-10 py-4 md:py-8">
         {/* Profile Header */}
-        <div className="flex items-center gap-4 md:gap-6 mb-8">
+        <div className="flex items-center gap-3 md:gap-6 mb-6 md:mb-8">
           {userProfile.image ? (
             <Image
               src={userProfile.image}
               alt={userProfile.name}
-              width={80}
-              height={80}
-              className="rounded-full"
+              width={64}
+              height={64}
+              className="rounded-full w-14 h-14 md:w-20 md:h-20"
             />
           ) : (
-            <div className="w-20 h-20 rounded-full bg-bg-sub flex items-center justify-center text-2xl text-main">
+            <div className="w-14 h-14 md:w-20 md:h-20 rounded-full bg-bg-sub flex items-center justify-center text-xl md:text-2xl text-main shrink-0">
               {userProfile.name.charAt(0).toUpperCase()}
             </div>
           )}
-          <div>
-            <h1 className="text-2xl md:text-4xl font-normal text-main mb-1">{userProfile.name}</h1>
-            <p className="text-sm text-sub">
+          <div className="min-w-0">
+            <h1 className="text-xl md:text-4xl font-normal text-main mb-1 truncate">{userProfile.name}</h1>
+            <p className="text-xs md:text-sm text-sub">
               joined {new Date(userProfile.joinedAt).toLocaleDateString('en-US', { 
                 year: 'numeric', 
                 month: 'long' 
@@ -194,13 +297,8 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
           </div>
         )}
 
-        {/* Share Link */}
-        <div className="mt-8 text-center">
-          <p className="text-xs text-sub mb-2">share this profile</p>
-          <code className="text-sm text-main bg-bg-sub px-4 py-2 rounded-lg">
-            devtype.pankajk.tech/profile/{username}
-          </code>
-        </div>
+        {/* Share & Embed */}
+        <EmbedSection username={username} />
       </main>
     </div>
   );

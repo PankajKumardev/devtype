@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Session } from 'next-auth';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
@@ -23,10 +24,14 @@ interface DashboardClientProps {
   session: Session;
 }
 
-export default function DashboardClient({ session }: DashboardClientProps) {
+export default function DashboardClient({ session: initialSession }: DashboardClientProps) {
+  const { data: sessionData } = useSession();
+  const session = sessionData || initialSession;
+
   const { dashboard, setDashboardData, shouldRefresh } = useDataCache();
   const [scores, setScores] = useState<Score[]>(dashboard?.scores || []);
   const [loading, setLoading] = useState(!dashboard);
+  
   const [dailyStreak, setDailyStreak] = useState(dashboard?.dailyStreak || 0);
   const [personalBest, setPersonalBest] = useState(0);
 
@@ -198,50 +203,50 @@ export default function DashboardClient({ session }: DashboardClientProps) {
 
       <main className="max-w-5xl mx-auto px-4 md:px-10 py-4 md:py-8">
         {/* Profile */}
-        <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-10">
-          {session.user?.image && (
-            <Image
-              src={session.user.image}
-              alt={session.user?.name || 'User'}
-              width={48}
-              height={48}
-              className="rounded-full md:w-16 md:h-16"
-            />
-          )}
-          <div>
-            <h1 className="text-xl md:text-3xl font-normal text-main">{session.user?.name}</h1>
-            <p className="text-sub text-xs md:text-base">{session.user?.email}</p>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4 mb-6 md:mb-10">
+          <div className="flex items-center gap-3 md:gap-4">
+            {session.user?.image && (
+              <Image
+                src={session.user.image}
+                alt={session.user?.name || 'User'}
+                width={48}
+                height={48}
+                className="rounded-full md:w-16 md:h-16"
+              />
+            )}
+            <div>
+              <h1 className="text-xl md:text-3xl font-normal text-main">{session.user?.name}</h1>
+              <p className="text-sub text-xs md:text-base">{session.user?.email}</p>
+            </div>
           </div>
-          <div className="ml-auto flex items-center gap-2">
+          
+          <div className="sm:ml-auto flex flex-wrap items-center gap-2">
             {dailyStreak > 0 && (
               <div className="px-3 py-1.5 bg-bg-sub rounded-lg border border-border">
-                <span className="text-sm text-sub">{dailyStreak} day streak</span>
+                <span className="text-xs sm:text-sm text-sub">{dailyStreak} day streak</span>
               </div>
             )}
-            {/* Export Buttons */}
-            <div className="flex gap-2">
-              <button
-                onClick={exportAsJSON}
-                disabled={scores.length === 0}
-                className="px-3 py-1.5 bg-bg-sub rounded-lg border border-border text-xs text-sub hover:text-text hover:border-main transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                export JSON
-              </button>
-              <button
-                onClick={exportAsCSV}
-                disabled={scores.length === 0}
-                className="px-3 py-1.5 bg-bg-sub rounded-lg border border-border text-xs text-sub hover:text-text hover:border-main transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                export CSV
-              </button>
-              <Link
-                href={`/profile/${encodeURIComponent(session.user?.name || '')}`}
-                className="px-3 py-1.5 bg-main rounded-lg text-xs font-medium hover:opacity-90 transition-opacity no-underline"
-                style={{ color: '#1a1a1a' }}
-              >
-                share profile
-              </Link>
-            </div>
+            <button
+              onClick={exportAsJSON}
+              disabled={scores.length === 0}
+              className="px-2 sm:px-3 py-1.5 bg-bg-sub rounded-lg border border-border text-xs text-sub hover:text-text hover:border-main transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              JSON
+            </button>
+            <button
+              onClick={exportAsCSV}
+              disabled={scores.length === 0}
+              className="px-2 sm:px-3 py-1.5 bg-bg-sub rounded-lg border border-border text-xs text-sub hover:text-text hover:border-main transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              CSV
+            </button>
+            <Link
+              href={`/profile/${session.user?.username || encodeURIComponent(session.user?.name || '')}`}
+              className="px-3 py-1.5 bg-main rounded-lg text-xs font-medium hover:opacity-90 transition-opacity no-underline"
+              style={{ color: '#1a1a1a' }}
+            >
+              share
+            </Link>
           </div>
         </div>
 

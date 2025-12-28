@@ -34,7 +34,10 @@ export async function GET(req: NextRequest) {
 
     // Get best score per user
     // Group by userId, take the highest weighted score for each user
-    const topScores = await Score.aggregate([
+    const mongooseInstance = await dbConnect();
+    const collection = mongooseInstance.connection.collection('scores');
+
+    const topScores = await collection.aggregate([
       { $match: query },
       {
         $addFields: {
@@ -69,7 +72,7 @@ export async function GET(req: NextRequest) {
         }
       },
       { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } }
-    ]);
+    ]).toArray();
 
     // Check if there are more results
     const hasMore = topScores.length > limit;
@@ -79,6 +82,7 @@ export async function GET(req: NextRequest) {
     const leaderboard = results.map((score: any, index: number) => ({
       rank: offset + index + 1,
       name: score.user?.name || 'Anonymous',
+      username: score.user?.username,
       image: score.user?.image,
       wpm: score.wpm,
       accuracy: score.accuracy,

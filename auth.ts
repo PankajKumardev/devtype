@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import dbConnect from '@/lib/mongodb';
-import { User } from '@/models/User';
+import { User, generateUsername } from '@/models/User';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
@@ -20,8 +20,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const existingUser = await User.findOne({ email: user.email });
           
           if (!existingUser) {
+            // Generate unique username
+            let username = generateUsername(user.name || 'user');
+            
+            // Make sure username is unique (retry if collision)
+            let attempts = 0;
+            while (attempts < 5) {
+              const exists = await User.findOne({ username });
+              if (!exists) break;
+              username = generateUsername(user.name || 'user');
+              attempts++;
+            }
+            
             await User.create({
               name: user.name,
+              username,
               email: user.email,
               image: user.image,
               providerId: account.providerAccountId,
@@ -41,10 +54,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session }) {
       if (session.user) {
         try {
-          await dbConnect();
-          const dbUser = await User.findOne({ email: session.user.email });
+          const mongooseInstance = await dbConnect();
+          const collection = mongooseInstance.connection.collection('users');
+          
+          const dbUser = await collection.findOne({ email: session.user.email });
+          
           if (dbUser) {
             session.user.id = dbUser._id.toString();
+            
+            // Generate username for existing users who don't have one
+            if (!dbUser.username) {
+              const username = generateUsername(dbUser.name || 'user');
+              await collection.updateOne(
+                { _id: dbUser._id },
+                { $set: { username } }
+              );
+              session.user.username = username;
+            } else {
+              session.user.username = dbUser.username;
+            }
+            
             session.user.stats = dbUser.stats;
           }
         } catch (error) {
@@ -58,3 +87,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: '/',
   },
 });
+

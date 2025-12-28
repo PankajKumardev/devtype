@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import dbConnect from '@/lib/mongodb';
 import { User } from '@/models/User';
 import { Score } from '@/models/Score';
@@ -10,18 +11,27 @@ export async function GET(
   try {
     const { username } = await params;
     
-    await dbConnect();
+    const mongooseInstance = await dbConnect();
 
-    // Find user by name (case insensitive)
-    const user = await User.findOne({ 
-      name: { $regex: new RegExp(`^${username}$`, 'i') }
-    });
+    // Use raw collection to bypass Mongoose schema caching issues (since we added username field recently)
+    const collection = mongooseInstance.connection.collection('users');
+    
+    // Find user by unique username OR by name (fallback)
+    let user = await collection.findOne({ username: username.toLowerCase() });
+    
+    // Fallback: try to find by name
+    if (!user) {
+      const decodedName = decodeURIComponent(username);
+      user = await collection.findOne({ 
+        name: { $regex: new RegExp(`^${decodedName}$`, 'i') }
+      });
+    }
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Get user's scores (all of them for accurate stats)
+    // Get user's scores
     const scores = await Score.find({ userId: user._id })
       .sort({ timestamp: -1 });
 
@@ -67,6 +77,7 @@ export async function GET(
     return NextResponse.json({
       profile: {
         name: user.name,
+        username: user.username,
         image: user.image,
         joinedAt: user.createdAt,
       },

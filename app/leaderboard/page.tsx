@@ -10,6 +10,7 @@ import { useDataCache } from '@/store/dataCacheStore';
 interface LeaderboardEntry {
   rank: number;
   name: string;
+  username?: string;
   image?: string;
   wpm: number;
   accuracy: number;
@@ -195,7 +196,12 @@ export default function LeaderboardPage() {
                       ) : (
                         <div className="w-7 h-7 rounded-full bg-sub/50" />
                       )}
-                      <span className="text-text text-sm">{entry.name}</span>
+                      <Link 
+                        href={`/profile/${entry.username || encodeURIComponent(entry.name)}`} 
+                        className="text-text text-sm no-underline hover:text-main transition-colors"
+                      >
+                        {entry.name}
+                      </Link>
                     </div>
                     <span className="text-main font-medium text-lg">{entry.wpm}</span>
                   </div>
@@ -245,7 +251,12 @@ export default function LeaderboardPage() {
                           ) : (
                             <div className="w-8 h-8 rounded-full bg-sub/50" />
                           )}
-                          <span className="text-text">{entry.name}</span>
+                          <Link 
+                            href={`/profile/${entry.username || encodeURIComponent(entry.name)}`} 
+                            className="text-text no-underline hover:text-main transition-colors"
+                          >
+                            {entry.name}
+                          </Link>
                         </div>
                       </td>
                       <td className="py-5 px-6">
