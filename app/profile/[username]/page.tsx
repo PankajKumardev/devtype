@@ -4,6 +4,7 @@ import { useEffect, useState, use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import HeatmapCalendar from '@/components/HeatmapCalendar';
+import { useDataCache } from '@/store/dataCacheStore';
 
 interface ProfileData {
   profile: {
@@ -133,12 +134,22 @@ function EmbedSection({ username }: { username: string }) {
 
 export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = use(params);
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
+  
+  const { profiles, setProfileData, shouldRefresh } = useDataCache();
+  const cachedProfile = profiles[username];
+  
+  const [profile, setProfile] = useState<ProfileData | null>(cachedProfile?.data || null);
+  const [loading, setLoading] = useState(!cachedProfile || shouldRefresh(cachedProfile.lastFetched));
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
+      // If we have valid cached data, use it and don't fetch
+      if (cachedProfile && !shouldRefresh(cachedProfile.lastFetched)) {
+        setLoading(false);
+        return;
+      }
+
       try {
         const response = await fetch(`/api/profile/${username}`);
         if (!response.ok) {
@@ -151,6 +162,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
         }
         const data = await response.json();
         setProfile(data);
+        setProfileData(username, data);
       } catch (err) {
         setError('Failed to load profile');
       } finally {

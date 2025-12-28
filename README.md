@@ -47,13 +47,21 @@ A typing speed application designed for programmers. Practice typing with real c
 - **Copy Results Image** - Share your results as an image on social media
 - **Export Data** - Download your typing history as JSON or CSV
 - **WPM History Graph** - Live WPM + Raw WPM chart with error markers
-- **Public Profiles** - Shareable profile pages with stats and activity heatmap
+- **Public Profiles** - Shareable profile pages with unique URLs (`/profile/username`) and activity stats
+- **Embeddable Heatmap** - Add your coding activity to your GitHub README with theme support (Dark, Ocean, Forest, Sunset, Light)
 
 ### SEO & PWA
 - **Meta Tags** - Complete SEO with Open Graph and Twitter cards
 - **Dynamic OG Images** - Auto-generated social preview images
 - **Sitemap & Robots.txt** - Full search engine optimization
 - **PWA Manifest** - Installable as a progressive web app
+
+### Embed Your Stats
+Add a dynamic activity heatmap to your GitHub profile or personal website:
+
+`![DevType Stats](https://devtype.pankajk.tech/api/embed/your_username?theme=ocean)`
+
+Supported themes: `dark` (default), `ocean`, `forest`, `sunset`, `light`.
 
 ## Tech Stack
 
@@ -113,10 +121,13 @@ devtype-app/
 ├── app/
 │   ├── api/
 │   │   ├── auth/[...nextauth]/
+│   │   ├── embed/[username]/   # SVG generation
 │   │   ├── leaderboard/
+│   │   ├── profile/[username]/ # Profile API
 │   │   └── scores/
 │   ├── dashboard/
 │   ├── leaderboard/
+│   ├── profile/[username]/     # Public profile page
 │   ├── opengraph-image.tsx    # Dynamic OG image generation
 │   ├── twitter-image.tsx       # Twitter card generation
 │   ├── sitemap.ts              # SEO sitemap

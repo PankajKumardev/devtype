@@ -39,13 +39,20 @@ interface LeaderboardData {
   };
 }
 
+interface ProfileCacheData {
+  data: any; // Using any to avoid duplicating big ProfileData interface here
+  lastFetched: number;
+}
+
 interface DataCacheState {
   dashboard: DashboardData | null;
   leaderboard: LeaderboardData;
+  profiles: Record<string, ProfileCacheData>; // Cache profiles by username
   
   // Actions
   setDashboardData: (data: Omit<DashboardData, 'lastFetched'>) => void;
   setLeaderboardData: (language: string, entries: LeaderboardEntry[]) => void;
+  setProfileData: (username: string, data: any) => void;
   invalidateDashboard: () => void;
   invalidateLeaderboard: () => void;
   shouldRefresh: (lastFetched: number) => boolean;
@@ -56,6 +63,7 @@ const CACHE_DURATION = 60000; // 1 minute
 export const useDataCache = create<DataCacheState>((set, get) => ({
   dashboard: null,
   leaderboard: {},
+  profiles: {},
 
   setDashboardData: (data) => {
     set({
@@ -72,6 +80,18 @@ export const useDataCache = create<DataCacheState>((set, get) => ({
         ...state.leaderboard,
         [language]: {
           entries,
+          lastFetched: Date.now(),
+        },
+      },
+    }));
+  },
+
+  setProfileData: (username, data) => {
+    set((state) => ({
+      profiles: {
+        ...state.profiles,
+        [username]: {
+          data,
           lastFetched: Date.now(),
         },
       },
