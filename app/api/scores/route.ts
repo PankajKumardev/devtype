@@ -82,8 +82,7 @@ export async function GET(req: NextRequest) {
     }
 
     const scores = await Score.find({ userId: user._id })
-      .sort({ timestamp: -1 })
-      .limit(10);
+      .sort({ timestamp: -1 });
 
     return NextResponse.json({ scores });
   } catch (error) {

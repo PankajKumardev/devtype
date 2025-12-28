@@ -8,6 +8,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart,
 import { getUnlockedAchievements, achievements, AchievementStats } from '@/lib/achievements';
 import { DashboardSkeleton } from '@/components/Skeletons';
 import { useDataCache } from '@/store/dataCacheStore';
+import HeatmapCalendar from '@/components/HeatmapCalendar';
 
 interface Score {
   _id: string;
@@ -116,6 +117,18 @@ export default function DashboardClient({ session }: DashboardClientProps) {
   const unlockedAchievements = getUnlockedAchievements(achievementStats);
   const lockedAchievements = achievements.filter(a => !unlockedAchievements.some(u => u.id === a.id));
 
+  // Calculate activity data for heatmap
+  const activityData = scores.reduce((acc, score) => {
+    const date = new Date(score.timestamp).toISOString().split('T')[0];
+    const existing = acc.find(d => d.date === date);
+    if (existing) {
+      existing.count++;
+    } else {
+      acc.push({ date, count: 1 });
+    }
+    return acc;
+  }, [] as { date: string; count: number }[]);
+
   // Export functions
   const exportAsJSON = () => {
     const exportData = {
@@ -221,6 +234,13 @@ export default function DashboardClient({ session }: DashboardClientProps) {
               >
                 export CSV
               </button>
+              <Link
+                href={`/profile/${encodeURIComponent(session.user?.name || '')}`}
+                className="px-3 py-1.5 bg-main rounded-lg text-xs font-medium hover:opacity-90 transition-opacity no-underline"
+                style={{ color: '#1a1a1a' }}
+              >
+                share profile
+              </Link>
             </div>
           </div>
         </div>
@@ -270,6 +290,11 @@ export default function DashboardClient({ session }: DashboardClientProps) {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Activity Heatmap */}
+        <div className="mb-6 md:mb-10">
+          <HeatmapCalendar activityData={activityData} />
         </div>
 
         {/* Charts Row */}

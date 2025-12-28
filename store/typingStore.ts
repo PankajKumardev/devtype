@@ -115,6 +115,7 @@ export const useTypingStore = create<TypingState>((set, get) => ({
       localStorage.setItem('devtype-mode', mode);
     }
   },
+
   setSnippet: (snippet) => set({ currentSnippet: snippet, userInput: '', currentIndex: 0 }),
 
   startTest: () => set({ 
@@ -343,6 +344,7 @@ export const useTypingStore = create<TypingState>((set, get) => ({
     const savedDuration = localStorage.getItem('devtype-duration');
     const savedLanguage = localStorage.getItem('devtype-language');
     const savedMode = localStorage.getItem('devtype-mode');
+    const savedDifficulty = localStorage.getItem('devtype-difficulty');
     
     const updates: Partial<TypingState> = {};
     
@@ -352,13 +354,15 @@ export const useTypingStore = create<TypingState>((set, get) => ({
       updates.timeRemaining = duration;
     }
     
-    if (savedLanguage && ['typescript', 'javascript', 'python', 'rust', 'go', 'java', 'cpp'].includes(savedLanguage)) {
+    if (savedLanguage && ['typescript', 'javascript', 'python', 'rust', 'go', 'java', 'csharp', 'cpp'].includes(savedLanguage)) {
       updates.language = savedLanguage as Language;
     }
     
     if (savedMode && (savedMode === 'timed' || savedMode === 'practice')) {
       updates.mode = savedMode as TestMode;
     }
+    
+
     
     if (Object.keys(updates).length > 0) {
       set(updates);

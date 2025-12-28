@@ -19,6 +19,7 @@ A typing speed application designed for programmers. Practice typing with real c
 - **Smart WPM Calculation** - WPM = (Correct Chars - Errors) / 5 / Minutes (prevents spam)
 
 ### Progress Tracking
+- **Activity Heatmap** - GitHub-style calendar showing your typing activity
 - **Personal Best Tracking** - Confetti celebration when you beat your record
 - **Daily Streak** - Track consecutive days of practice
 - **Achievement Badges** - Unlock achievements for speed, accuracy, and consistency
@@ -46,6 +47,7 @@ A typing speed application designed for programmers. Practice typing with real c
 - **Copy Results Image** - Share your results as an image on social media
 - **Export Data** - Download your typing history as JSON or CSV
 - **WPM History Graph** - Live WPM + Raw WPM chart with error markers
+- **Public Profiles** - Shareable profile pages with stats and activity heatmap
 
 ### SEO & PWA
 - **Meta Tags** - Complete SEO with Open Graph and Twitter cards
